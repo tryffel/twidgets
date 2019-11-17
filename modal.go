@@ -17,6 +17,7 @@
 package twidgets
 
 import (
+	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
@@ -33,10 +34,21 @@ type Modal interface {
 	SetVisible(visible bool)
 }
 
-/*ModalLayout is a grid layout that draws modal on center of grid.
-To add ordinary items to layout, get grid with Grid() function. Layout consists of 6 columns and rows
-defined as (2, -1, -2, -2, -1, 2). Modal is drawn on middle 4 cells
+type ModalSize int
 
+const (
+	//ModalSizeSmall creates modal of 1/5 size of layout, or 2 columns
+	ModalSizeSmall ModalSize = 2
+	//ModalSizeMedium creates modal of 2/5 size of layout, or 4 columns
+	ModalSizeMedium ModalSize = 3
+	//ModalSizeMedium creates modal of 3/5 size of layout, or 6 columns
+	ModalSizeLarge ModalSize = 4
+)
+
+
+/*ModalLayout is a grid layout that draws modal on center of grid.
+To add ordinary items to layout, get grid with Grid() function. Layout consists of 10 columns and rows,
+each one of size -1. This can be changed with SetGridSize, but size must still 10. Modal is drawn on middle 4 cells
 Use AddModal and RemoveModal to manage modals. Only single modal can be shown at a time.
  */
 type ModalLayout struct {
@@ -63,7 +75,8 @@ func NewModalLayout() *ModalLayout {
 	Put modal to rows/cols 3-4
 	Changing these requires also changing AddColumn()-> grid.AddItem indices.
 	 */
-	m.gridAxis = []int{2, -1, -2, -2, -1, 2}
+	m.gridAxis = []int{-1, -1, -1, -1, -1}
+	m.gridAxis = append(m.gridAxis, m.gridAxis...)
 
 	m.grid.SetRows(m.gridAxis...)
 	m.grid.SetColumns(m.gridAxis...)
@@ -102,32 +115,82 @@ func (m *ModalLayout) GetFocusable() tview.Focusable {
 	return m.grid.GetFocusable()
 }
 
+//GetGrid returns underlying grid that items are added to
 func (m *ModalLayout) Grid() *tview.Grid {
 	return m.grid
 }
 
+//GetGridSize returns grid that's in use
+func (m *ModalLayout) GetGridSize() []int {
+	return m.gridAxis
+}
+
+func (m *ModalLayout) SetGridSize(grid []int) error {
+	if len(grid) != 10 {
+		return fmt.Errorf("invalid size")
+	}
+	m.gridAxis = grid
+
+	m.grid.SetRows(m.gridAxis...)
+	m.grid.SetColumns(m.gridAxis...)
+	return nil
+}
+
+//AddDynamicModal adds modal of dynamic size
+func (m *ModalLayout) AddDynamicModal(modal Modal, size ModalSize) {
+	m.addModal(modal, 0, 0, false, size)
+}
+
+//AddFixedModal adds modal of fixed size.
+//Size parameter controls how many rows and columns are used for modal
+func (m *ModalLayout) AddFixedModal(modal Modal, height, width uint, size ModalSize) {
+	m.addModal(modal, height, width, true, size)
+}
+
+
 //AddModal adds modal to center of layout
 // lockSize flag defines whether modal size should be locked or dynamic.
-func (m *ModalLayout) AddModal(modal Modal, height, width uint, lockSize bool) {
+func (m *ModalLayout) addModal(modal Modal, height, width uint, lockSize bool, size ModalSize) {
+	r, w := 0, 0
+	span := 0
+	switch size {
+	case ModalSizeSmall:
+		r, w = 4, 4
+		span = 2
+	case ModalSizeMedium:
+		r, w = 3, 3
+		span = 4
+	case ModalSizeLarge:
+		r, w = 2, 2
+		span = 6
+	default:
+		return
+	}
+
 	if m.hasModal {
 		return
 	}
 	if !lockSize {
 		m.customGrid = false
-		m.grid.AddItem(modal, 2, 2, 2, 2, 8, 30, true)
+		m.grid.AddItem(modal, r, w, span, span, 8, 30, true)
 	} else {
 		m.customGrid = true
 		x := make([]int, len(m.gridAxis))
 		y := make([]int, len(m.gridAxis))
 		copy(x, m.gridAxis)
 		copy(y, m.gridAxis)
-		x[2] = int(width / 2)
-		x[3] = x[2]
-		y[2] = int(height / 2)
-		y[3] = y[2]
+
+		// single col / row size
+		row := width / uint(span)
+		col := height / uint(span)
+
+		for i := r; i < r + span; i++ {
+			x[i] = int(row)
+			y[i] = int(col)
+		}
 		m.grid.SetRows(y...)
 		m.grid.SetColumns(x...)
-		m.grid.AddItem(modal, 2, 2, 2, 2, int(height), int(width), true)
+		m.grid.AddItem(modal, r, w, span, span, int(height), int(width), true)
 	}
 	m.hasModal = true
 	m.modal = modal

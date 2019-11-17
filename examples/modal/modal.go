@@ -63,7 +63,7 @@ func main() {
 	text.SetText("Some ordinary text. \nModal opens in 1 second")
 	text.SetBorder(true)
 
-	layout.Grid().AddItem(text, 0, 0, 6, 6, 10,10,false)
+	layout.Grid().AddItem(text, 0, 0, 10, 10, 10,10,false)
 
 	//Close modal
 	close := func() {
@@ -79,7 +79,9 @@ func main() {
 		time.Sleep(1 * time.Second)
 		app.QueueUpdateDraw(func() {
 			text.Blur()
-			layout.AddModal(&modal, 0, 20, false)
+			//layout.AddDynamicModal(&modal, twidgets.ModalSizeMedium/)
+			layout.AddFixedModal(&modal, 10, 10, twidgets.ModalSizeLarge)
+
 			app.SetFocus(&modal)
 		})
 	}
