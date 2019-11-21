@@ -58,7 +58,8 @@ type ModalLayout struct {
 	modal      Modal
 
 	//Default grid col/row weights
-	gridAxis   []int
+	gridAxisX []int
+	gridAxisY []int
 }
 
 //NewModalLayout creates new modal layout and returns it
@@ -68,18 +69,20 @@ func NewModalLayout() *ModalLayout {
 		hasModal:   false,
 		customGrid: false,
 		modal:      nil,
-		gridAxis:   nil,
+		gridAxisX:  nil,
+		gridAxisY:  nil,
 	}
 
 	/*
 	Put modal to rows/cols 3-4
 	Changing these requires also changing AddColumn()-> grid.AddItem indices.
 	 */
-	m.gridAxis = []int{-1, -1, -1, -1, -1}
-	m.gridAxis = append(m.gridAxis, m.gridAxis...)
+	m.gridAxisX = []int{-1, -1, -1, -1, -1}
+	m.gridAxisX = append(m.gridAxisX, m.gridAxisX...)
+	m.gridAxisY = m.gridAxisX
 
-	m.grid.SetRows(m.gridAxis...)
-	m.grid.SetColumns(m.gridAxis...)
+	m.grid.SetRows(m.gridAxisX...)
+	m.grid.SetColumns(m.gridAxisX...)
 	m.grid.SetMinSize(2, 2)
 
 	return m
@@ -122,17 +125,25 @@ func (m *ModalLayout) Grid() *tview.Grid {
 
 //GetGridSize returns grid that's in use
 func (m *ModalLayout) GetGridSize() []int {
-	return m.gridAxis
+	return m.gridAxisX
 }
 
-func (m *ModalLayout) SetGridSize(grid []int) error {
+func (m *ModalLayout) SetGridXSize(grid []int) error {
 	if len(grid) != 10 {
 		return fmt.Errorf("invalid size")
 	}
-	m.gridAxis = grid
+	m.gridAxisX = grid
 
-	m.grid.SetRows(m.gridAxis...)
-	m.grid.SetColumns(m.gridAxis...)
+	m.grid.SetColumns(m.gridAxisX...)
+	return nil
+}
+
+func (m *ModalLayout) SetGridYSize(grid []int) error {
+	if len(grid) != 10 {
+		return fmt.Errorf("invalid size")
+	}
+	m.gridAxisY = grid
+	m.grid.SetColumns(m.gridAxisY...)
 	return nil
 }
 
@@ -175,10 +186,10 @@ func (m *ModalLayout) addModal(modal Modal, height, width uint, lockSize bool, s
 		m.grid.AddItem(modal, r, w, span, span, 8, 30, true)
 	} else {
 		m.customGrid = true
-		x := make([]int, len(m.gridAxis))
-		y := make([]int, len(m.gridAxis))
-		copy(x, m.gridAxis)
-		copy(y, m.gridAxis)
+		x := make([]int, len(m.gridAxisX))
+		y := make([]int, len(m.gridAxisY))
+		copy(x, m.gridAxisX)
+		copy(y, m.gridAxisY)
 
 		// single col / row size
 		row := width / uint(span)
@@ -204,8 +215,8 @@ func (m *ModalLayout) RemoveModal(modal Modal) {
 		m.hasModal = false
 		m.modal = nil
 		if m.customGrid {
-			m.grid.SetRows(m.gridAxis...)
-			m.grid.SetColumns(m.gridAxis...)
+			m.grid.SetRows(m.gridAxisY...)
+			m.grid.SetColumns(m.gridAxisX...)
 			m.customGrid = false
 		}
 	}
