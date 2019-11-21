@@ -143,7 +143,7 @@ func (m *ModalLayout) SetGridYSize(grid []int) error {
 		return fmt.Errorf("invalid size")
 	}
 	m.gridAxisY = grid
-	m.grid.SetColumns(m.gridAxisY...)
+	m.grid.SetRows(m.gridAxisY...)
 	return nil
 }
 
