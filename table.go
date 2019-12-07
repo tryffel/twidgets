@@ -59,11 +59,12 @@ func NewTable() *Table {
 	}
 
 	t.Table.SetFixed(1, 100)
-	t.Table.SetSelectable(true,true)
+	t.Table.SetSelectable(true,false)
 	t.sortCol = 0
 	t.sortType = SortAsc
 	t.SetCellSimple(0,0, "#")
-	t.Select(0,0)
+
+	t.SetFixed(1, 10)
 	return t
 }
 
@@ -103,6 +104,7 @@ func (t *Table) Clear(headers bool) *Table {
 			t.Table.SetCell(0, i, cells[i])
 		}
 	}
+	t.SetOffset(1,0)
 	return t
 }
 
@@ -170,19 +172,35 @@ func (t *Table) SetColumns(columns []string) *Table {
 //Inputhandler handles header row inputs
 func (t *Table) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 	return func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
+		enableHeader := false
 		key := event.Key()
+		if t.sortFunc != nil {
+			row, _ := t.Table.GetSelection()
+			if row == 1 && key == tcell.KeyUp {
+				enableHeader = true
+				t.Table.SetSelectable(true, true)
+				t.Table.Select(0, t.sortCol)
+			} else if row == 0 && key == tcell.KeyDown {
+				t.Table.SetSelectable(true, false)
+			}
+			if key == tcell.KeyEnter && row == 0 && t.sortFunc != nil {
+				t.updateSort()
+			}
+		}
+		// User might move to first/last row, catch when user moves to 0 row and select
+		// 1st row instead. This is only if user moved with other key than key up
 		row, _ := t.Table.GetSelection()
-		if row == 1 && key == tcell.KeyUp {
-			t.Table.SetSelectable(true, true)
-			t.Table.Select(0, t.sortCol)
-		} else if row == 0 && key == tcell.KeyDown {
+		atHeader := row == 0
+		t.Table.InputHandler()(event, setFocus)
+		row, _ = t.Table.GetSelection()
+		if row == 0 && !atHeader && !enableHeader{
+			t.Table.Select(1, 0)
 			t.Table.SetSelectable(true,false)
+		} else if enableHeader {
+			t.Table.Select(0, t.sortCol)
+			t.Table.SetSelectable(true,true)
 		}
-		if key == tcell.KeyEnter && row == 0 && t.sortFunc != nil {
-			t.updateSort()
-		}
-			t.Table.InputHandler()(event, setFocus)
-		}
+	}
 }
 
 
