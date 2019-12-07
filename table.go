@@ -44,6 +44,8 @@ type Table struct {
 	*tview.Table
 
 	columns   []string
+	columnWidths []int
+	columnExpansions []int
 	showIndex bool
 	sortCol   int
 	sortType  Sort
@@ -88,6 +90,18 @@ func (t *Table) SetShowIndex(index bool) {
 	t.showIndex = index
 }
 
+// SetColumnWidths sets each columns maximum width. If index is included as first row,
+// it must be included in here.
+func (t *Table) SetColumnWidths(widths []int) {
+	t.columnWidths = widths
+}
+
+// SetColumnExpansions sets how each column will expand / shrink when changing terminal size.
+// If index is included as first row, it must be included in here.
+func (t *Table) SetColumnExpansions(expansions []int) {
+	t.columnExpansions = expansions
+}
+
 // Clear clears the content of the table. If headers==true, remove headers as well
 func (t *Table) Clear(headers bool) *Table {
 	if headers {
@@ -122,6 +136,13 @@ func (t *Table) AddRow(index int, content ...string) *Table {
 	}
 
 	for i := 0; i < len(cells); i++ {
+		if len(t.columnWidths) >= i && t.columnWidths != nil {
+			cells[i].SetMaxWidth(t.columnWidths[i])
+		}
+		if len(t.columnExpansions) >= i && t.columnExpansions != nil {
+			cells[i].SetExpansion(t.columnExpansions[i])
+		}
+
 		if t.addCellFunc != nil {
 			t.addCellFunc(cells[i], false, index+1)
 		}

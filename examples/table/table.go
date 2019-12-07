@@ -31,6 +31,8 @@ func main() {
 	table.SetAddCellFunc(addCell)
 	table.SetShowIndex(true)
 	table.SetColumns([]string{"Name", "Description"})
+	table.SetColumnWidths([]int{2,10,15})
+	table.SetColumnExpansions([]int{0,1,2})
 	table.SetSort(1, twidgets.SortAsc)
 
 	table.AddRow(0, "A", "first sample")
@@ -66,6 +68,7 @@ func main() {
 	}
 	}
 	table.SetSortFunc(sortFunc)
+	//table.SetSortFunc(nil)
 
 	app.Run()
 }
