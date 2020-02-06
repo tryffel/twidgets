@@ -21,14 +21,17 @@ import (
 	"github.com/rivo/tview"
 )
 
+//ListItem is an item that can be used in ScrollList. Additional SetSelected is required
+// since item doesn't receive focus on selection but still gets to change its visual style.
 type ListItem interface {
 	tview.Primitive
 	SetSelected(selected bool)
 }
 
 
-//ScrollGrid is a grid that can have more items than it can currently show.
-// It allows user to scroll items. It also manages columns and rows dynamically.
+//ScrollGrid is a list that can have more items than it can currently show.
+// It allows user to scroll items. It also manages rows dynamically. Use Padding and ItemHeight to change
+// grid size. Use Up/Down to navigate between items and Enter to select item.
 type ScrollList struct {
 	*tview.Grid
 	// Padding is num of rows or relative expansion, see tview.Grid.SetColumns() for usage
@@ -40,13 +43,17 @@ type ScrollList struct {
 	visibleFrom int
 	visibleTo int
 	rows int
+
+	selectFunc func(int)
 }
 
-//NewScrollList creates new scroll grid. ItemHeight/weight sets single item height
-func NewScrollList() *ScrollList {
+//NewScrollList creates new scroll grid. selectFunc is called whenever user presses Enter on some item.
+//SelectFunc can be nil.
+func NewScrollList(selectFunc func(index int)) *ScrollList {
 	s := &ScrollList{
 		Grid:            tview.NewGrid(),
 		items:           make([]ListItem, 0),
+		selectFunc:      selectFunc,
 	}
 
 	s.Padding = 1
@@ -54,11 +61,25 @@ func NewScrollList() *ScrollList {
 	return s
 }
 
+//AddItem appends single item
 func (s *ScrollList) AddItem(i ListItem) {
 	s.items = append(s.items, i)
+	if len(s.items) == 0 {
+		s.items[s.selected].SetSelected(true)
+	}
+	if len(s.items) < s.rows {
+		s.updateGridItems()
+	}
+}
+
+//AddItems appends multiple items
+func (s *ScrollList) AddItems(i ...ListItem) {
+	s.items = append(s.items, i...)
+	s.updateGridItems()
 }
 
 
+//Clear clears list items an updates view
 func (s *ScrollList) Clear() {
 	s.items = make([]ListItem, 0)
 	s.selected = 0
@@ -88,6 +109,10 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 				s.selected -= 1
 				s.items[s.selected].SetSelected(true)
 				s.updateGridItems()
+			}
+		case tcell.KeyEnter:
+			if s.selectFunc != nil {
+				s.selectFunc(s.selected)
 			}
 		default:
 			return
