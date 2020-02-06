@@ -31,7 +31,7 @@ type ListItem interface {
 
 //ScrollGrid is a list that can have more items than it can currently show.
 // It allows user to scroll items. It also manages rows dynamically. Use Padding and ItemHeight to change
-// grid size. Use Up/Down to navigate between items and Enter to select item.
+// grid size. Use Up/Down + (vim: j/k/g/G) to navigate between items and Enter to select item.
 type ScrollList struct {
 	*tview.Grid
 	// Padding is num of rows or relative expansion, see tview.Grid.SetColumns() for usage
@@ -94,28 +94,55 @@ func (s *ScrollList) SetRect(x, y, w, h int) {
 func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 	return s.Grid.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 		key := event.Key()
+		r := event.Rune()
+
+		scrollDown := false
+		scrollUp := false
+
+		pagedDown := false
+		pageUp := false
 
 		switch key {
 		case tcell.KeyDown:
-			if s.selected < len(s.items)-1 {
-				s.items[s.selected].SetSelected(false)
-				s.selected += 1
-				s.items[s.selected].SetSelected(true)
-				s.updateGridItems()
-			}
+			scrollDown = true
 		case tcell.KeyUp:
-			if s.selected > 0 {
-				s.items[s.selected].SetSelected(false)
-				s.selected -= 1
-				s.items[s.selected].SetSelected(true)
-				s.updateGridItems()
-			}
+			scrollUp = true
 		case tcell.KeyEnter:
 			if s.selectFunc != nil {
 				s.selectFunc(s.selected)
 			}
 		default:
-			return
+			if r == 'j' {
+				scrollDown = true
+			} else if r == 'k' {
+				scrollUp = true
+			} else if r == 'g' {
+				pageUp = true
+			} else if r == 'G' {
+				pagedDown = true
+			}
+		}
+
+		if scrollDown && s.selected < len(s.items)-1  {
+			s.items[s.selected].SetSelected(false)
+			s.selected += 1
+			s.items[s.selected].SetSelected(true)
+			s.updateGridItems()
+		} else if scrollUp && s.selected > 0  {
+			s.items[s.selected].SetSelected(false)
+			s.selected -= 1
+			s.items[s.selected].SetSelected(true)
+			s.updateGridItems()
+		} else if pageUp {
+			s.items[s.selected].SetSelected(false)
+			s.selected = 0
+			s.items[s.selected].SetSelected(true)
+			s.updateGridItems()
+		} else if pagedDown {
+			s.items[s.selected].SetSelected(false)
+			s.selected = len(s.items) -1
+			s.items[s.selected].SetSelected(true)
+			s.updateGridItems()
 		}
 	})
 }
