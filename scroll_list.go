@@ -91,6 +91,10 @@ func (s *ScrollList) SetRect(x, y, w, h int) {
 	s.Grid.SetRect(x, y, w, h)
 }
 
+func (s *ScrollList) GetSelectedIndex() int {
+	return s.selected
+}
+
 func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 	return s.Grid.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 		key := event.Key()
