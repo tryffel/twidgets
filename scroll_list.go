@@ -199,6 +199,10 @@ func (s *ScrollList) updateGrid(x, y, w, h int) {
 
 // update grid items after selecting new items
 func (s *ScrollList) updateGridItems() {
+	if len(s.items) == 0 {
+		return
+	}
+
 	if s.rows == 1 {
 		s.visibleFrom = s.selected
 		s.visibleTo = s.selected
