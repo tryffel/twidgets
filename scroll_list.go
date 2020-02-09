@@ -161,9 +161,10 @@ func (s *ScrollList) updateGrid(x, y, w, h int) {
 		return
 	}
 
-	rows := h / s.ItemHeight
+	rows := h / (s.ItemHeight + s.Padding * 2 -1)
+
 	// tview adds 1 row of empty height
-	if rows * s.ItemHeight + (rows + 2) * s.Padding + 1 >= h {
+	if rows * s.ItemHeight + (rows + 2) * s.Padding  >= h {
 		rows -= 1
 
 	}
@@ -178,7 +179,7 @@ func (s *ScrollList) updateGrid(x, y, w, h int) {
 	s.rows = rows
 	// expand row items if needed
 	if s.visibleFrom == 0 {
-		s.visibleTo = s.rows
+		s.visibleTo = s.rows -1
 	} else if s.visibleTo == len(s.items)-1 {
 		s.visibleFrom = s.visibleTo - s.rows +1
 	}
