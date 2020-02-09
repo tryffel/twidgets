@@ -1,0 +1,23 @@
+kind: pipeline
+name: default
+
+steps:
+- name: tests
+  image: golang
+  volumes:
+  - name: deps
+    path: /go
+  commands:
+  - go mod download
+  - go test ./...
+
+trigger:
+  event:
+    include:
+    - push
+    - pull_request
+
+volumes:
+- name: deps
+  temp: {}
+
