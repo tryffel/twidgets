@@ -186,7 +186,7 @@ func (s *ScrollList) updateGrid(x, y, w, h int) {
 	if rows == -1 {
 		s.Grid.Clear()
 		s.Grid.SetRows()
-		s.Grid.SetColumns(2, 40, -2)
+		s.Grid.SetColumns(2, -2, -1)
 		return
 	}
 
@@ -211,7 +211,7 @@ func (s *ScrollList) updateGrid(x, y, w, h int) {
 	// fill grid
 	s.Grid.Clear()
 	s.Grid.SetRows(gridRow...)
-	s.Grid.SetColumns(2, 40, -2)
+	s.Grid.SetColumns(2, -2, -1)
 
 	s.updateGridItems()
 }
