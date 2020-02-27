@@ -28,21 +28,20 @@ type ListItem interface {
 	SetSelected(selected bool)
 }
 
-
 //ScrollGrid is a list that can have more items than it can currently show.
 // It allows user to scroll items. It also manages rows dynamically. Use Padding and ItemHeight to change
 // grid size. Use Up/Down + (vim: j/k/g/G) to navigate between items and Enter to select item.
 type ScrollList struct {
 	*tview.Grid
 	// Padding is num of rows or relative expansion, see tview.Grid.SetColumns() for usage
-	Padding int
+	Padding    int
 	ItemHeight int
-	items  []ListItem
-	selected int
+	items      []ListItem
+	selected   int
 	// range that is visible from array
 	visibleFrom int
-	visibleTo int
-	rows int
+	visibleTo   int
+	rows        int
 
 	selectFunc func(int)
 	blurFunc   func(key tcell.Key)
@@ -56,9 +55,9 @@ func (s *ScrollList) SetBlurFunc(blur func(key tcell.Key)) {
 //SelectFunc can be nil.
 func NewScrollList(selectFunc func(index int)) *ScrollList {
 	s := &ScrollList{
-		Grid:            tview.NewGrid(),
-		items:           make([]ListItem, 0),
-		selectFunc:      selectFunc,
+		Grid:       tview.NewGrid(),
+		items:      make([]ListItem, 0),
+		selectFunc: selectFunc,
 	}
 
 	s.Padding = 1
@@ -82,7 +81,6 @@ func (s *ScrollList) AddItems(i ...ListItem) {
 	s.items = append(s.items, i...)
 	s.updateGridItems()
 }
-
 
 //Clear clears list items an updates view
 func (s *ScrollList) Clear() {
@@ -120,6 +118,10 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 			if s.selectFunc != nil {
 				s.selectFunc(s.selected)
 			}
+		case tcell.KeyTAB:
+			if s.blurFunc != nil {
+				s.blurFunc(key)
+			}
 		default:
 			if r == 'j' {
 				scrollDown = true
@@ -132,12 +134,12 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 			}
 		}
 
-		if scrollDown && s.selected < len(s.items)-1  {
+		if scrollDown && s.selected < len(s.items)-1 {
 			s.items[s.selected].SetSelected(false)
 			s.selected += 1
 			s.items[s.selected].SetSelected(true)
 			s.updateGridItems()
-		} else if scrollUp && s.selected > 0  {
+		} else if scrollUp && s.selected > 0 {
 			s.items[s.selected].SetSelected(false)
 			s.selected -= 1
 			s.items[s.selected].SetSelected(true)
@@ -149,13 +151,12 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 			s.updateGridItems()
 		} else if pagedDown {
 			s.items[s.selected].SetSelected(false)
-			s.selected = len(s.items) -1
+			s.selected = len(s.items) - 1
 			s.items[s.selected].SetSelected(true)
 			s.updateGridItems()
 		}
 	})
 }
-
 
 //update grid size after resizing widget
 func (s *ScrollList) updateGrid(x, y, w, h int) {
@@ -166,10 +167,10 @@ func (s *ScrollList) updateGrid(x, y, w, h int) {
 		return
 	}
 
-	rows := h / (s.ItemHeight + s.Padding * 2 -1)
+	rows := h / (s.ItemHeight + s.Padding*2 - 1)
 
 	// tview adds 1 row of empty height
-	if rows * s.ItemHeight + (rows + 2) * s.Padding  >= h {
+	if rows*s.ItemHeight+(rows+2)*s.Padding >= h {
 		rows -= 1
 
 	}
@@ -184,13 +185,13 @@ func (s *ScrollList) updateGrid(x, y, w, h int) {
 	s.rows = rows
 	// expand row items if needed
 	if s.visibleFrom == 0 {
-		s.visibleTo = s.rows -1
+		s.visibleTo = s.rows - 1
 	} else if s.visibleTo == len(s.items)-1 {
-		s.visibleFrom = s.visibleTo - s.rows +1
+		s.visibleFrom = s.visibleTo - s.rows + 1
 	}
 
 	// init grid
-	gridRow := make([]int, rows * 2 + 1)
+	gridRow := make([]int, rows*2+1)
 
 	for i := 0; i < rows; i++ {
 		gridRow[i*2] = s.Padding
@@ -222,34 +223,32 @@ func (s *ScrollList) updateGridItems() {
 	}
 	if s.selected < s.visibleFrom {
 		s.visibleFrom = s.selected
-		s.visibleTo = s.selected + s.rows -1
+		s.visibleTo = s.selected + s.rows - 1
 
 	} else if s.selected > s.visibleTo {
 		s.visibleTo = s.selected
-		s.visibleFrom = s.selected - s.rows +1
+		s.visibleFrom = s.selected - s.rows + 1
 	}
 
 	if s.visibleTo < 0 {
 		s.visibleTo = 0
 	}
-	if s.visibleFrom > len(s.items) -1 {
-		s.visibleFrom = len(s.items) -1
+	if s.visibleFrom > len(s.items)-1 {
+		s.visibleFrom = len(s.items) - 1
 	}
 	if s.visibleFrom < 0 {
 		s.visibleFrom = 0
 	}
-	if s.visibleTo > len(s.items) -1 {
-		s.visibleTo = len(s.items) -1
+	if s.visibleTo > len(s.items)-1 {
+		s.visibleTo = len(s.items) - 1
 	}
 
 	s.Grid.Clear()
 	for i := 0; i < s.rows; i++ {
-		if i > s.visibleTo || s.visibleFrom + i > len(s.items) -1 {
+		if i > s.visibleTo || s.visibleFrom+i > len(s.items)-1 {
 			break
 		}
-		item := s.items[s.visibleFrom + i]
-		s.Grid.AddItem(item, i * 2 +1,  1, 1, 1, 4,10, false)
+		item := s.items[s.visibleFrom+i]
+		s.Grid.AddItem(item, i*2+1, 1, 1, 1, 4, 10, false)
 	}
 }
-
-

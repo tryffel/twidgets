@@ -45,12 +45,11 @@ const (
 	ModalSizeLarge ModalSize = 4
 )
 
-
 /*ModalLayout is a grid layout that draws modal on center of grid.
 To add ordinary items to layout, get grid with Grid() function. Layout consists of 10 columns and rows,
 each one of size -1. This can be changed with SetGridSize, but size must still 10. Modal is drawn on middle 4 cells
 Use AddModal and RemoveModal to manage modals. Only single modal can be shown at a time.
- */
+*/
 type ModalLayout struct {
 	grid       *tview.Grid
 	hasModal   bool
@@ -74,9 +73,9 @@ func NewModalLayout() *ModalLayout {
 	}
 
 	/*
-	Put modal to rows/cols 3-4
-	Changing these requires also changing AddColumn()-> grid.AddItem indices.
-	 */
+		Put modal to rows/cols 3-4
+		Changing these requires also changing AddColumn()-> grid.AddItem indices.
+	*/
 	m.gridAxisX = []int{-1, -1, -1, -1, -1}
 	m.gridAxisX = append(m.gridAxisX, m.gridAxisX...)
 	m.gridAxisY = m.gridAxisX
@@ -158,7 +157,6 @@ func (m *ModalLayout) AddFixedModal(modal Modal, height, width uint, size ModalS
 	m.addModal(modal, height, width, true, size)
 }
 
-
 //AddModal adds modal to center of layout
 // lockSize flag defines whether modal size should be locked or dynamic.
 func (m *ModalLayout) addModal(modal Modal, height, width uint, lockSize bool, size ModalSize) {
@@ -195,7 +193,7 @@ func (m *ModalLayout) addModal(modal Modal, height, width uint, lockSize bool, s
 		row := width / uint(span)
 		col := height / uint(span)
 
-		for i := r; i < r + span; i++ {
+		for i := r; i < r+span; i++ {
 			x[i] = int(row)
 			y[i] = int(col)
 		}

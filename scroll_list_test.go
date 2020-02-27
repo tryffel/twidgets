@@ -28,7 +28,6 @@ type testItem struct {
 
 func (t *testItem) SetSelected(bool) {}
 
-
 func TestScrollList_updateGrid(t *testing.T) {
 	// Test grid size & num of elements is updated correctly
 
@@ -44,11 +43,11 @@ func TestScrollList_updateGrid(t *testing.T) {
 	}
 
 	type fields struct {
-		list *ScrollList
-		selected int
-		padding int
+		list       *ScrollList
+		selected   int
+		padding    int
 		itemHeight int
-		borders bool
+		borders    bool
 	}
 	type args struct {
 		x int
@@ -57,9 +56,9 @@ func TestScrollList_updateGrid(t *testing.T) {
 		h int
 	}
 	type out struct {
-		rows int
+		rows        int
 		visibleFrom int
-		visibleTo int
+		visibleTo   int
 	}
 	tests := []struct {
 		name   string
@@ -69,42 +68,41 @@ func TestScrollList_updateGrid(t *testing.T) {
 	}{
 		{
 			name: "item-border",
-			fields:fields{
+			fields: fields{
 				list:       NewScrollList(nil),
 				selected:   0,
 				padding:    1,
 				itemHeight: 5,
 				borders:    true,
 			},
-			args:args{
+			args: args{
 				x: 0,
 				y: 0,
 				w: 50,
 				h: 22,
 			},
-			out:out{
+			out: out{
 				rows:        3,
 				visibleFrom: 0,
 				visibleTo:   2,
 			},
-
 		},
 		{
 			name: "item-no-border",
-			fields:fields{
+			fields: fields{
 				list:       NewScrollList(nil),
 				selected:   0,
 				padding:    1,
 				itemHeight: 2,
 				borders:    false,
 			},
-			args:args{
+			args: args{
 				x: 0,
 				y: 0,
 				w: 50,
 				h: 19,
 			},
-			out:out{
+			out: out{
 				rows:        5,
 				visibleFrom: 0,
 				visibleTo:   4,
@@ -114,10 +112,9 @@ func TestScrollList_updateGrid(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-
 			tt.fields.list.selected = tt.fields.selected
-			tt.fields.list.Padding= tt.fields.padding
-			tt.fields.list.ItemHeight= tt.fields.itemHeight
+			tt.fields.list.Padding = tt.fields.padding
+			tt.fields.list.ItemHeight = tt.fields.itemHeight
 
 			for i := 0; i < createItems; i++ {
 				items[i].SetBorder(tt.fields.borders)

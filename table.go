@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	arrowUp = "▲"
+	arrowUp   = "▲"
 	arrowDown = "▼"
 )
 
@@ -37,34 +37,33 @@ const (
 	SortDesc
 )
 
-
 // Table extends tview.Table with some helpers for managing rows.
 // In addition it provides sorting capabilities.
 type Table struct {
 	*tview.Table
 
-	columns   []string
-	columnWidths []int
+	columns          []string
+	columnWidths     []int
 	columnExpansions []int
-	showIndex bool
-	sortCol   int
-	sortType  Sort
+	showIndex        bool
+	sortCol          int
+	sortType         Sort
 
-	sortFunc func(col string, sort Sort)
+	sortFunc    func(col string, sort Sort)
 	addCellFunc func(cell *tview.TableCell, header bool, col int)
 }
 
 // NewTable creates new table instance
 func NewTable() *Table {
 	t := &Table{
-		Table:    tview.NewTable(),
+		Table: tview.NewTable(),
 	}
 
 	t.Table.SetFixed(1, 100)
-	t.Table.SetSelectable(true,false)
+	t.Table.SetSelectable(true, false)
 	t.sortCol = 0
 	t.sortType = SortAsc
-	t.SetCellSimple(0,0, "#")
+	t.SetCellSimple(0, 0, "#")
 
 	t.SetFixed(1, 10)
 	return t
@@ -118,7 +117,7 @@ func (t *Table) Clear(headers bool) *Table {
 			t.Table.SetCell(0, i, cells[i])
 		}
 	}
-	t.SetOffset(1,0)
+	t.SetOffset(1, 0)
 	return t
 }
 
@@ -132,7 +131,7 @@ func (t *Table) AddRow(index int, content ...string) *Table {
 	}
 
 	if t.showIndex {
-		cells = append([]*tview.TableCell{tview.NewTableCell(fmt.Sprint(index+1))}, cells...)
+		cells = append([]*tview.TableCell{tview.NewTableCell(fmt.Sprint(index + 1))}, cells...)
 	}
 
 	for i := 0; i < len(cells); i++ {
@@ -189,7 +188,6 @@ func (t *Table) SetColumns(columns []string) *Table {
 	return t
 }
 
-
 //Inputhandler handles header row inputs
 func (t *Table) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 	return func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
@@ -214,16 +212,15 @@ func (t *Table) InputHandler() func(event *tcell.EventKey, setFocus func(p tview
 		atHeader := row == 0
 		t.Table.InputHandler()(event, setFocus)
 		row, _ = t.Table.GetSelection()
-		if row == 0 && !atHeader && !enableHeader{
+		if row == 0 && !atHeader && !enableHeader {
 			t.Table.Select(1, 0)
-			t.Table.SetSelectable(true,false)
+			t.Table.SetSelectable(true, false)
 		} else if enableHeader {
 			t.Table.Select(0, t.sortCol)
-			t.Table.SetSelectable(true,true)
+			t.Table.SetSelectable(true, true)
 		}
 	}
 }
-
 
 //update sort and call sortFunc if there is one
 func (t *Table) updateSort() {

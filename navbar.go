@@ -23,30 +23,29 @@ import (
 )
 
 type NavBarColors struct {
-	Background tcell.Color
-	BackgroundFocus tcell.Color
-	ButtonBackground tcell.Color
+	Background            tcell.Color
+	BackgroundFocus       tcell.Color
+	ButtonBackground      tcell.Color
 	ButtonBackgroundFocus tcell.Color
-	Text	tcell.Color
-	TextFocus tcell.Color
-	Shortcut tcell.Color
-	ShortcutFocus tcell.Color
+	Text                  tcell.Color
+	TextFocus             tcell.Color
+	Shortcut              tcell.Color
+	ShortcutFocus         tcell.Color
 }
-
 
 /* NavBar implements navigation bar with multiple buttons
  */
 type NavBar struct {
-	grid *tview.Grid
-	buttons []*tview.Button
-	btnKeys []tcell.Key
+	grid      *tview.Grid
+	buttons   []*tview.Button
+	btnKeys   []tcell.Key
 	btnLabels []string
-	doneFunc func(label string)
-	colors *NavBarColors
+	doneFunc  func(label string)
+	colors    *NavBarColors
 
 	// Which button is active
 	btnActiveIndex int
-	hasFocus	   bool
+	hasFocus       bool
 }
 
 func (n *NavBar) Draw(screen tcell.Screen) {
@@ -62,33 +61,33 @@ func (n *NavBar) SetRect(x, y, width, height int) {
 }
 
 func (n *NavBar) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
-		return func (event *tcell.EventKey, setFocus func(p tview.Primitive)) {
-			lastBtn := n.btnActiveIndex
+	return func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
+		lastBtn := n.btnActiveIndex
 
-			key := event.Key()
-			if key == tcell.KeyRight {
-				n.btnActiveIndex = min(len(n.buttons)-1, n.btnActiveIndex+1)
-			} else if key == tcell.KeyLeft {
-				n.btnActiveIndex = max(0, n.btnActiveIndex-1)
-			}
-
-			if lastBtn != n.btnActiveIndex {
-				n.buttons[lastBtn].Blur()
-				n.buttons[n.btnActiveIndex].Focus(nil)
-			}
-
-			if key == tcell.KeyEnter {
-				n.callDone(n.btnLabels[n.btnActiveIndex])
-			}
-
-			for i, v := range n.btnKeys {
-				if key == v {
-					n.callDone(n.btnLabels[i])
-					break
-				}
-			}
-			n.grid.InputHandler()(event, setFocus)
+		key := event.Key()
+		if key == tcell.KeyRight {
+			n.btnActiveIndex = min(len(n.buttons)-1, n.btnActiveIndex+1)
+		} else if key == tcell.KeyLeft {
+			n.btnActiveIndex = max(0, n.btnActiveIndex-1)
 		}
+
+		if lastBtn != n.btnActiveIndex {
+			n.buttons[lastBtn].Blur()
+			n.buttons[n.btnActiveIndex].Focus(nil)
+		}
+
+		if key == tcell.KeyEnter {
+			n.callDone(n.btnLabels[n.btnActiveIndex])
+		}
+
+		for i, v := range n.btnKeys {
+			if key == v {
+				n.callDone(n.btnLabels[i])
+				break
+			}
+		}
+		n.grid.InputHandler()(event, setFocus)
+	}
 }
 
 func (n *NavBar) Focus(delegate func(p tview.Primitive)) {
@@ -109,12 +108,12 @@ func (n *NavBar) GetFocusable() tview.Focusable {
 
 func NewNavBar(colors *NavBarColors, doneFunc func(label string)) *NavBar {
 	nav := &NavBar{
-		grid:     tview.NewGrid(),
-		buttons:  []*tview.Button{},
-		btnKeys: []tcell.Key{},
+		grid:      tview.NewGrid(),
+		buttons:   []*tview.Button{},
+		btnKeys:   []tcell.Key{},
 		btnLabels: []string{},
-		doneFunc: doneFunc,
-		colors: colors,
+		doneFunc:  doneFunc,
+		colors:    colors,
 	}
 
 	nav.grid.SetBorders(false)
@@ -146,7 +145,7 @@ func (n *NavBar) AddButton(button *tview.Button, key tcell.Key) {
 
 	widths := make([]int, len(n.buttons)*2+1)
 	spaceWidth := -1
-	for i  := 0; i < len(n.buttons) + 1; i++ {
+	for i := 0; i < len(n.buttons)+1; i++ {
 		widths[i*2] = -2
 		if i > 0 {
 			widths[i*2-1] = spaceWidth
@@ -167,5 +166,3 @@ func (n *NavBar) callDone(label string) {
 		n.doneFunc(label)
 	}
 }
-
-
