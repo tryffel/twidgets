@@ -24,6 +24,22 @@ import (
 	"tryffel.net/go/twidgets"
 )
 
+// we need button that implements twidgets.Selectable
+type button struct {
+	*tview.Button
+}
+
+func (b *button) SetBlurFunc(blur func(key tcell.Key)) {
+	b.Button.SetBlurFunc(blur)
+}
+
+func newButton(label string) *button {
+	b := &button{
+		Button: tview.NewButton(label),
+	}
+	return b
+}
+
 var app *tview.Application
 
 func main() {
@@ -31,19 +47,20 @@ func main() {
 
 	banner := twidgets.NewBanner()
 
-	btnExit := tview.NewButton("Exit")
+	btnExit := newButton("Exit")
 	btnExit.SetSelectedFunc(func() {
 		app.Stop()
 		fmt.Print("Exit\n")
 	})
 
-	btnOne := tview.NewButton("One")
-	btnTwo := tview.NewButton("Two")
+	btnOne := newButton("One")
+	btnTwo := newButton("Two")
 
 	text := tview.NewTextView()
 	text.SetText("This is a text view\nanother row")
 
-	btns := []*tview.Button{btnExit, btnOne, btnTwo}
+	btns := []*button{btnExit, btnOne, btnTwo}
+	selectables := []twidgets.Selectable{btnExit, btnOne, btnTwo}
 	for _, btn := range btns {
 		btn.SetLabelColor(tcell.ColorBlack)
 		btn.SetLabelColorActivated(tcell.ColorGray)
@@ -51,8 +68,7 @@ func main() {
 		btn.SetBackgroundColorActivated(tcell.ColorGreen)
 	}
 
-	banner.Selectable = btns
-
+	banner.Selectable = selectables
 	banner.Grid.SetRows(1, 1, 1, 1)
 	banner.Grid.SetColumns(6, 2, 10, -1, 10, -1, 10, -3)
 	banner.Grid.SetMinSize(1, 6)

@@ -21,6 +21,14 @@ import (
 	"github.com/rivo/tview"
 )
 
+// Selectable is a primitive that's able to set blur func
+type Selectable interface {
+	tview.Primitive
+	// SetBlurFunc sets blur function that gets called upon blurring primitive
+	SetBlurFunc(func(key tcell.Key))
+}
+
+
 // Banner combines grid layout and form-movement. To use, configure grid and add elements to it. To allow some item
 // to be selected, add it to Banner.Selectable. Order in this array is same as with selections. Only buttons are
 // supported as selectables. Most of the logic has been copied tview.Form.
@@ -28,7 +36,7 @@ type Banner struct {
 	*tview.Grid
 
 	//Selectable are all primitives that can be navigated and selected inside Banner.
-	Selectable []*tview.Button
+	Selectable []Selectable
 	selected int
 	hasFocus bool
 
@@ -37,7 +45,7 @@ type Banner struct {
 func NewBanner() *Banner {
 	b := &Banner{
 		Grid: tview.NewGrid(),
-		Selectable: []*tview.Button{},
+		Selectable: []Selectable{},
 	}
 	return b
 
@@ -57,10 +65,10 @@ func (b *Banner) Focus(delegate func(p tview.Primitive)) {
 	}
 	handler := func(key tcell.Key) {
 		switch key {
-		case tcell.KeyTab, tcell.KeyEnter:
+		case tcell.KeyTab, tcell.KeyEnter, tcell.KeyCtrlJ:
 			b.selected++
 			b.Focus(delegate)
-		case tcell.KeyBacktab:
+		case tcell.KeyBacktab, tcell.KeyCtrlK:
 			b.selected--
 			if b.selected< 0 {
 				b.selected= len(b.Selectable) - 1
@@ -78,8 +86,8 @@ func (b *Banner) Focus(delegate func(p tview.Primitive)) {
 		}
 	}
 
-		// We're selecting a button.
-		button := b.Selectable[b.selected]
-		button.SetBlurFunc(handler)
-		delegate(button)
+	// We're selecting a button.
+	button := b.Selectable[b.selected]
+	button.SetBlurFunc(handler)
+	delegate(button)
 }
