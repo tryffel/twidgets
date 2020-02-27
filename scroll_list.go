@@ -21,11 +21,19 @@ import (
 	"github.com/rivo/tview"
 )
 
+type Selection int
+
+const (
+	Selected Selection = iota
+	Blurred
+	Deselected
+)
+
 //ListItem is an item that can be used in ScrollList. Additional SetSelected is required
 // since item doesn't receive focus on selection but still gets to change its visual style.
 type ListItem interface {
 	tview.Primitive
-	SetSelected(selected bool)
+	SetSelected(selected Selection)
 }
 
 //ScrollGrid is a list that can have more items than it can currently show.
@@ -69,7 +77,7 @@ func NewScrollList(selectFunc func(index int)) *ScrollList {
 func (s *ScrollList) AddItem(i ListItem) {
 	s.items = append(s.items, i)
 	if len(s.items) == 0 {
-		s.items[s.selected].SetSelected(true)
+		s.items[s.selected].SetSelected(Selected)
 	}
 	if len(s.items) < s.rows {
 		s.updateGridItems()
@@ -135,24 +143,24 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 		}
 
 		if scrollDown && s.selected < len(s.items)-1 {
-			s.items[s.selected].SetSelected(false)
+			s.items[s.selected].SetSelected(Deselected)
 			s.selected += 1
-			s.items[s.selected].SetSelected(true)
+			s.items[s.selected].SetSelected(Selected)
 			s.updateGridItems()
 		} else if scrollUp && s.selected > 0 {
-			s.items[s.selected].SetSelected(false)
+			s.items[s.selected].SetSelected(Deselected)
 			s.selected -= 1
-			s.items[s.selected].SetSelected(true)
+			s.items[s.selected].SetSelected(Selected)
 			s.updateGridItems()
 		} else if pageUp {
-			s.items[s.selected].SetSelected(false)
+			s.items[s.selected].SetSelected(Deselected)
 			s.selected = 0
-			s.items[s.selected].SetSelected(true)
+			s.items[s.selected].SetSelected(Selected)
 			s.updateGridItems()
 		} else if pagedDown {
-			s.items[s.selected].SetSelected(false)
+			s.items[s.selected].SetSelected(Deselected)
 			s.selected = len(s.items) - 1
-			s.items[s.selected].SetSelected(true)
+			s.items[s.selected].SetSelected(Selected)
 			s.updateGridItems()
 		}
 	})
@@ -250,5 +258,17 @@ func (s *ScrollList) updateGridItems() {
 		}
 		item := s.items[s.visibleFrom+i]
 		s.Grid.AddItem(item, i*2+1, 1, 1, 1, 4, 10, false)
+	}
+}
+
+func (s *ScrollList) Focus(delegate func(p tview.Primitive)) {
+	if len(s.items) > 0 {
+		s.items[s.selected].SetSelected(Selected)
+	}
+}
+
+func (s *ScrollList) Blur() {
+	if len(s.items) > 0 {
+		s.items[s.selected].SetSelected(Blurred)
 	}
 }

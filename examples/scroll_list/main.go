@@ -28,13 +28,15 @@ type Item struct {
 	*tview.TextView
 }
 
-func (i *Item) SetSelected(selected bool) {
-	if selected {
+func (i *Item) SetSelected(selected twidgets.Selection) {
+	if selected == twidgets.Selected {
 		i.SetBorderAttributes(tcell.AttrBold)
 		i.SetBorderColor(tcell.ColorBlue)
-	} else {
+		i.SetTextColor(tcell.ColorYellow)
+	} else if selected == twidgets.Deselected {
 		i.SetBorderAttributes(tcell.AttrNone)
 		i.SetBorderColor(tcell.ColorWhite)
+		i.SetTextColor(tcell.ColorGray)
 	}
 }
 
@@ -48,14 +50,14 @@ func NewItem(text string) *Item {
 	return i
 }
 
-
 func main() {
 	app := tview.NewApplication()
 	list := twidgets.NewScrollList(printSelect)
-	list.ItemHeight = 5
+	list.ItemHeight = 2
 
 	for i := 0; i < 10; i++ {
-		item := NewItem(fmt.Sprintf("%d. item\nrow2\nrow3", i))
+		item := NewItem(fmt.Sprintf("%d. item\nrow2", i))
+		item.SetBorder(false)
 		item.SetBorderPadding(0, 0, 1, 1)
 		list.AddItem(item)
 	}

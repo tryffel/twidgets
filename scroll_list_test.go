@@ -26,7 +26,7 @@ type testItem struct {
 	*tview.TextView
 }
 
-func (t *testItem) SetSelected(bool) {}
+func (t *testItem) SetSelected(selection Selection) {}
 
 func TestScrollList_updateGrid(t *testing.T) {
 	// Test grid size & num of elements is updated correctly
