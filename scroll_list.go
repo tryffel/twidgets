@@ -45,6 +45,11 @@ type ScrollList struct {
 	rows int
 
 	selectFunc func(int)
+	blurFunc   func(key tcell.Key)
+}
+
+func (s *ScrollList) SetBlurFunc(blur func(key tcell.Key)) {
+	s.blurFunc = blur
 }
 
 //NewScrollList creates new scroll grid. selectFunc is called whenever user presses Enter on some item.
