@@ -82,7 +82,7 @@ func NewModalLayout() *ModalLayout {
 
 	m.grid.SetRows(m.gridAxisX...)
 	m.grid.SetColumns(m.gridAxisX...)
-	m.grid.SetMinSize(2, 2)
+	m.grid.SetMinSize(1, 1)
 
 	return m
 }
