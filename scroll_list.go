@@ -126,7 +126,7 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 			if s.selectFunc != nil {
 				s.selectFunc(s.selected)
 			}
-		case tcell.KeyTAB:
+		case tcell.KeyTAB, tcell.KeyBacktab:
 			if s.blurFunc != nil {
 				s.blurFunc(key)
 			}
@@ -147,6 +147,8 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 			s.selected += 1
 			s.items[s.selected].SetSelected(Selected)
 			s.updateGridItems()
+		} else if scrollUp && s.selected == 0 && s.blurFunc != nil {
+			s.blurFunc(tcell.KeyBacktab)
 		} else if scrollUp && s.selected > 0 {
 			s.items[s.selected].SetSelected(Deselected)
 			s.selected -= 1
