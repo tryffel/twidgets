@@ -22,6 +22,7 @@ import (
 	"github.com/rivo/tview"
 )
 
+// NacBarColors are colors that fully describe navbar look
 type NavBarColors struct {
 	Background            tcell.Color
 	BackgroundFocus       tcell.Color
@@ -33,8 +34,8 @@ type NavBarColors struct {
 	ShortcutFocus         tcell.Color
 }
 
-/* NavBar implements navigation bar with multiple buttons
- */
+// NavBar implements navigation bar with multiple buttons. Buttons can be added one by one, each one having
+// their own callbacks. In addition, optional DoneFunc is called with label of the selected button.
 type NavBar struct {
 	grid      *tview.Grid
 	buttons   []*tview.Button
@@ -106,6 +107,8 @@ func (n *NavBar) GetFocusable() tview.Focusable {
 	return n.grid.GetFocusable()
 }
 
+// NewNavBar creates new navigation bar. DoneFunc is called with buttons label whenever user clicks some button.
+// DoneFunc can be set nil.
 func NewNavBar(colors *NavBarColors, doneFunc func(label string)) *NavBar {
 	nav := &NavBar{
 		grid:      tview.NewGrid(),
@@ -124,6 +127,7 @@ func NewNavBar(colors *NavBarColors, doneFunc func(label string)) *NavBar {
 	return nav
 }
 
+//AddButton adds a new button to right side of existing buttons. Key is used to print and highlight key to user
 func (n *NavBar) AddButton(button *tview.Button, key tcell.Key) {
 	n.buttons = append(n.buttons, button)
 	n.btnKeys = append(n.btnKeys, key)

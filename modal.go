@@ -34,6 +34,7 @@ type Modal interface {
 	SetVisible(visible bool)
 }
 
+// ModalSize describes both horizontal & vertical size for modal
 type ModalSize int
 
 const (
@@ -61,7 +62,8 @@ type ModalLayout struct {
 	gridAxisY []int
 }
 
-//NewModalLayout creates new modal layout and returns it
+//NewModalLayout creates new modal layout. Default grid is
+// [-1, -1, -1, -1, -1]. This can be modified by accessing grid with ModalLayout.Grid()
 func NewModalLayout() *ModalLayout {
 	m := &ModalLayout{
 		grid:       tview.NewGrid(),
@@ -127,6 +129,7 @@ func (m *ModalLayout) GetGridSize() []int {
 	return m.gridAxisX
 }
 
+//SetGrixXSize sets grid in horizontal direction
 func (m *ModalLayout) SetGridXSize(grid []int) error {
 	if len(grid) != 10 {
 		return fmt.Errorf("invalid size")
@@ -137,6 +140,7 @@ func (m *ModalLayout) SetGridXSize(grid []int) error {
 	return nil
 }
 
+//SetGrixYSize sets grid in vertical direction
 func (m *ModalLayout) SetGridYSize(grid []int) error {
 	if len(grid) != 10 {
 		return fmt.Errorf("invalid size")

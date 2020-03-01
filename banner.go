@@ -28,7 +28,6 @@ type Selectable interface {
 	SetBlurFunc(func(key tcell.Key))
 }
 
-
 // Banner combines grid layout and form-movement. To use, configure grid and add elements to it. To allow some item
 // to be selected, add it to Banner.Selectable. Order in this array is same as with selections. Only buttons are
 // supported as selectables. Most of the logic has been copied tview.Form.
@@ -37,14 +36,14 @@ type Banner struct {
 
 	//Selectable are all primitives that can be navigated and selected inside Banner.
 	Selectable []Selectable
-	selected int
-	hasFocus bool
-
+	selected   int
+	hasFocus   bool
 }
 
+// NewBanner initializes new banner
 func NewBanner() *Banner {
 	b := &Banner{
-		Grid: tview.NewGrid(),
+		Grid:       tview.NewGrid(),
 		Selectable: []Selectable{},
 	}
 	return b
@@ -60,8 +59,8 @@ func (b *Banner) Focus(delegate func(p tview.Primitive)) {
 	b.hasFocus = false
 
 	// Hand on the focus to one of our child elements.
-	if b.selected< 0 || b.selected>= len(b.Selectable) {
-		b.selected= 0
+	if b.selected < 0 || b.selected >= len(b.Selectable) {
+		b.selected = 0
 	}
 	handler := func(key tcell.Key) {
 		switch key {
@@ -70,19 +69,19 @@ func (b *Banner) Focus(delegate func(p tview.Primitive)) {
 			b.Focus(delegate)
 		case tcell.KeyBacktab, tcell.KeyCtrlK:
 			b.selected--
-			if b.selected< 0 {
-				b.selected= len(b.Selectable) - 1
+			if b.selected < 0 {
+				b.selected = len(b.Selectable) - 1
 			}
 			b.Focus(delegate)
 		case tcell.KeyEscape:
 			/*
-			if b.cancel != nil {
-				b.cancel()
-			} else {
-				b.focusedElement = 0
-				b.Focus(delegate)
-			}
-			 */
+				if b.cancel != nil {
+					b.cancel()
+				} else {
+					b.focusedElement = 0
+					b.Focus(delegate)
+				}
+			*/
 		}
 	}
 

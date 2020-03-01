@@ -27,7 +27,7 @@ const (
 	arrowDown = "▼"
 )
 
-// SortType
+// SortType is a direction that can be sorted with
 type Sort int
 
 const (
