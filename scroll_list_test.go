@@ -103,9 +103,9 @@ func TestScrollList_updateGrid(t *testing.T) {
 				h: 19,
 			},
 			out: out{
-				rows:        5,
+				rows:        6,
 				visibleFrom: 0,
-				visibleTo:   4,
+				visibleTo:   5,
 			},
 		},
 	}

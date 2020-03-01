@@ -87,6 +87,8 @@ func (s *ScrollList) AddItem(i ListItem) {
 //AddItems appends multiple items
 func (s *ScrollList) AddItems(i ...ListItem) {
 	s.items = append(s.items, i...)
+	x, y, w, h := s.GetRect()
+	s.updateGrid(x, y, w, h)
 	s.updateGridItems()
 }
 
@@ -170,20 +172,7 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 
 //update grid size after resizing widget
 func (s *ScrollList) updateGrid(x, y, w, h int) {
-	_, _, cw, ch := s.GetRect()
-
-	// if no change, skip
-	if cw == w && ch == h {
-		return
-	}
-
 	rows := h / (s.ItemHeight + s.Padding*2 - 1)
-
-	// tview adds 1 row of empty height
-	if rows*s.ItemHeight+(rows+2)*s.Padding >= h {
-		rows -= 1
-
-	}
 
 	if rows == -1 {
 		s.Grid.Clear()
