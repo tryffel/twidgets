@@ -19,6 +19,7 @@ package twidgets
 import (
 	"fmt"
 	"github.com/rivo/tview"
+	"reflect"
 	"testing"
 )
 
@@ -59,6 +60,7 @@ func TestScrollList_updateGrid(t *testing.T) {
 		rows        int
 		visibleFrom int
 		visibleTo   int
+		wantGrid    []int
 	}
 	tests := []struct {
 		name   string
@@ -67,7 +69,7 @@ func TestScrollList_updateGrid(t *testing.T) {
 		out    out
 	}{
 		{
-			name: "item-border",
+			name: "bordered",
 			fields: fields{
 				list:       NewScrollList(nil),
 				selected:   0,
@@ -85,6 +87,51 @@ func TestScrollList_updateGrid(t *testing.T) {
 				rows:        3,
 				visibleFrom: 0,
 				visibleTo:   2,
+				wantGrid:    []int{5, 1, 5, 1, 5, -1},
+			},
+		},
+		{
+			name: "bordered no bottom padding",
+			fields: fields{
+				list:       NewScrollList(nil),
+				selected:   0,
+				padding:    1,
+				itemHeight: 5,
+				borders:    true,
+			},
+			args: args{
+				x: 0,
+				y: 0,
+				w: 50,
+				h: 23,
+			},
+			out: out{
+				rows:        4,
+				visibleFrom: 0,
+				visibleTo:   3,
+				wantGrid:    []int{5, 1, 5, 1, 5, 1, 5},
+			},
+		},
+		{
+			name: "bordered no bottom padding-3",
+			fields: fields{
+				list:       NewScrollList(nil),
+				selected:   0,
+				padding:    1,
+				itemHeight: 5,
+				borders:    true,
+			},
+			args: args{
+				x: 0,
+				y: 0,
+				w: 50,
+				h: 25,
+			},
+			out: out{
+				rows:        4,
+				visibleFrom: 0,
+				visibleTo:   3,
+				wantGrid:    []int{5, 1, 5, 1, 5, 1, 5, -1},
 			},
 		},
 		{
@@ -106,6 +153,29 @@ func TestScrollList_updateGrid(t *testing.T) {
 				rows:        6,
 				visibleFrom: 0,
 				visibleTo:   5,
+				wantGrid:    []int{2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, -1},
+			},
+		},
+		{
+			name: "2-height no padding",
+			fields: fields{
+				list:       NewScrollList(nil),
+				selected:   0,
+				padding:    1,
+				itemHeight: 2,
+				borders:    false,
+			},
+			args: args{
+				x: 0,
+				y: 0,
+				w: 50,
+				h: 10,
+			},
+			out: out{
+				rows:        3,
+				visibleFrom: 0,
+				visibleTo:   2,
+				wantGrid:    []int{2, 1, 2, 1, 2, -1},
 			},
 		},
 	}
@@ -138,6 +208,10 @@ func TestScrollList_updateGrid(t *testing.T) {
 					tt.fields.list.visibleTo, tt.out.visibleTo)
 			}
 
+			if !reflect.DeepEqual(tt.fields.list.gridRows, tt.out.wantGrid) {
+				t.Errorf("scoll_list.updateGrid() grid rows: got %v, expected %v",
+					tt.fields.list.gridRows, tt.out.wantGrid)
+			}
 		})
 	}
 }

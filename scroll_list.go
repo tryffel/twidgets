@@ -50,6 +50,8 @@ type ScrollList struct {
 	visibleFrom int
 	visibleTo   int
 	rows        int
+	gridRows    []int
+	border      bool
 
 	selectFunc func(int)
 	blurFunc   func(key tcell.Key)
@@ -68,8 +70,10 @@ func NewScrollList(selectFunc func(index int)) *ScrollList {
 		selectFunc: selectFunc,
 	}
 
+	s.Grid.SetColumns(2, -2, -1)
 	s.Padding = 1
 	s.ItemHeight = 3
+	s.gridRows = []int{2, -2, -1}
 	return s
 }
 
@@ -172,12 +176,23 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 
 //update grid size after resizing widget
 func (s *ScrollList) updateGrid(x, y, w, h int) {
-	rows := h / (s.ItemHeight + s.Padding*2 - 1)
+	if s.border {
+		h -= 2
+	}
+
+	// how many rows with padding
+	rows := h / (s.ItemHeight + s.Padding)
+	takes := rows * (s.ItemHeight + s.Padding)
+	noBottomPadding := false
+	if takes+s.ItemHeight == h {
+		// add one row without bottom padding
+		rows += 1
+		noBottomPadding = true
+	}
 
 	if rows == -1 {
 		s.Grid.Clear()
 		s.Grid.SetRows()
-		s.Grid.SetColumns(2, -2, -1)
 		return
 	}
 
@@ -190,19 +205,27 @@ func (s *ScrollList) updateGrid(x, y, w, h int) {
 	}
 
 	// init grid
-	gridRow := make([]int, rows*2+1)
+	gridRow := make([]int, rows*2)
 
+	// fill rows
 	for i := 0; i < rows; i++ {
-		gridRow[i*2] = s.Padding
-		gridRow[i*2+1] = s.ItemHeight
+		gridRow[i*2] = s.ItemHeight
+		gridRow[i*2+1] = s.Padding
 	}
-	// make last row flexible size
-	gridRow[len(gridRow)-1] = -1
+
+	if !noBottomPadding {
+		// set bottom padding flexible
+		gridRow[len(gridRow)-1] = -1
+
+	} else {
+
+		gridRow = gridRow[:len(gridRow)-1]
+	}
 
 	// fill grid
 	s.Grid.Clear()
+	s.gridRows = gridRow
 	s.Grid.SetRows(gridRow...)
-	s.Grid.SetColumns(2, -2, -1)
 
 	s.updateGridItems()
 }
@@ -220,6 +243,8 @@ func (s *ScrollList) updateGridItems() {
 		s.Grid.AddItem(s.items[s.selected], 1, 1, 1, 1, 4, 10, false)
 		return
 	}
+
+	// which items are visible, is selected one of them
 	if s.selected < s.visibleFrom {
 		s.visibleFrom = s.selected
 		s.visibleTo = s.selected + s.rows - 1
@@ -248,7 +273,7 @@ func (s *ScrollList) updateGridItems() {
 			break
 		}
 		item := s.items[s.visibleFrom+i]
-		s.Grid.AddItem(item, i*2+1, 1, 1, 1, 4, 10, false)
+		s.Grid.AddItem(item, i*2, 1, 1, 1, 4, 10, false)
 	}
 }
 
@@ -262,4 +287,9 @@ func (s *ScrollList) Blur() {
 	if len(s.items) > 0 {
 		s.items[s.selected].SetSelected(Blurred)
 	}
+}
+
+func (s *ScrollList) SetBorder(b bool) {
+	s.Grid.SetBorder(b)
+	s.border = true
 }
