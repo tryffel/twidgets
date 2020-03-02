@@ -190,7 +190,7 @@ func (s *ScrollList) updateGrid(x, y, w, h int) {
 		noBottomPadding = true
 	}
 
-	if rows == -1 {
+	if rows == 0 {
 		s.Grid.Clear()
 		s.Grid.SetRows()
 		return
@@ -289,7 +289,8 @@ func (s *ScrollList) Blur() {
 	}
 }
 
-func (s *ScrollList) SetBorder(b bool) {
+func (s *ScrollList) SetBorder(b bool) *tview.Box {
 	s.Grid.SetBorder(b)
 	s.border = true
+	return s.Box
 }

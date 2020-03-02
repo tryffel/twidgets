@@ -69,6 +69,28 @@ func TestScrollList_updateGrid(t *testing.T) {
 		out    out
 	}{
 		{
+			name: "one-row",
+			fields: fields{
+				list:       NewScrollList(nil),
+				selected:   0,
+				padding:    1,
+				itemHeight: 2,
+				borders:    true,
+			},
+			args: args{
+				x: 0,
+				y: 0,
+				w: 50,
+				h: 4,
+			},
+			out: out{
+				rows:        1,
+				visibleFrom: 0,
+				visibleTo:   0,
+				wantGrid:    []int{2, -1},
+			},
+		},
+		{
 			name: "bordered",
 			fields: fields{
 				list:       NewScrollList(nil),
