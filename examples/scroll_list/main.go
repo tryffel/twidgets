@@ -26,6 +26,7 @@ import (
 
 type Item struct {
 	*tview.TextView
+	text string
 }
 
 func (i *Item) SetSelected(selected twidgets.Selection) {
@@ -43,6 +44,7 @@ func (i *Item) SetSelected(selected twidgets.Selection) {
 func NewItem(text string) *Item {
 	i := &Item{
 		TextView: tview.NewTextView(),
+		text:     text,
 	}
 
 	i.SetBorder(true)
@@ -55,12 +57,27 @@ func main() {
 	list := twidgets.NewScrollList(printSelect)
 	list.ItemHeight = 2
 
+	items := make([]*Item, 0)
+
 	for i := 0; i < 10; i++ {
 		item := NewItem(fmt.Sprintf("%d. item\nrow2", i))
 		item.SetBorder(false)
 		item.SetBorderPadding(0, 0, 1, 1)
 		list.AddItem(item)
+		items = append(items, item)
 	}
+
+	// alter item text when it's selected / deselected
+	indexChangedFunc := func(next int) bool {
+		current := list.GetSelectedIndex()
+		items[current].SetText(items[current].text)
+
+		items[next].SetText("  " + items[next].text)
+		return true
+	}
+
+	list.SetIndexChangedFunc(indexChangedFunc)
+
 	app.SetRoot(list, true)
 	app.Run()
 }

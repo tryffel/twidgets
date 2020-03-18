@@ -53,8 +53,9 @@ type ScrollList struct {
 	gridRows    []int
 	border      bool
 
-	selectFunc func(int)
-	blurFunc   func(key tcell.Key)
+	selectFunc       func(int)
+	blurFunc         func(key tcell.Key)
+	indexChangedFunc func(int) bool
 }
 
 func (s *ScrollList) SetBlurFunc(blur func(key tcell.Key)) {
@@ -103,6 +104,12 @@ func (s *ScrollList) Clear() {
 	s.Grid.Clear()
 }
 
+// SetIndexChangedFunc sets a function that gets called every time list index is about to change.
+// New index is passed to function. If it returns true, index changes. If false, index is being retained.
+func (s *ScrollList) SetIndexChangedFunc(indexChanged func(int) bool) {
+	s.indexChangedFunc = indexChanged
+}
+
 func (s *ScrollList) SetRect(x, y, w, h int) {
 	s.updateGrid(x, y, w, h)
 	s.Grid.SetRect(x, y, w, h)
@@ -114,6 +121,13 @@ func (s *ScrollList) GetSelectedIndex() int {
 
 func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 	return s.Grid.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
+		var acceptIndexChanged func(int) bool
+		if s.indexChangedFunc != nil {
+			acceptIndexChanged = s.indexChangedFunc
+		} else {
+			acceptIndexChanged = func(int) bool { return true }
+		}
+
 		key := event.Key()
 		r := event.Rune()
 
@@ -148,26 +162,23 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 			}
 		}
 
+		newIndex := s.selected
+
 		if scrollDown && s.selected < len(s.items)-1 {
-			s.items[s.selected].SetSelected(Deselected)
-			s.selected += 1
-			s.items[s.selected].SetSelected(Selected)
-			s.updateGridItems()
+			newIndex += 1
 		} else if scrollUp && s.selected == 0 && s.blurFunc != nil {
 			s.blurFunc(tcell.KeyBacktab)
 		} else if scrollUp && s.selected > 0 {
-			s.items[s.selected].SetSelected(Deselected)
-			s.selected -= 1
-			s.items[s.selected].SetSelected(Selected)
-			s.updateGridItems()
+			newIndex -= 1
 		} else if pageUp {
-			s.items[s.selected].SetSelected(Deselected)
-			s.selected = 0
-			s.items[s.selected].SetSelected(Selected)
-			s.updateGridItems()
+			newIndex = 0
 		} else if pagedDown {
+			newIndex = len(s.items) - 1
+		}
+
+		if acceptIndexChanged(newIndex) {
 			s.items[s.selected].SetSelected(Deselected)
-			s.selected = len(s.items) - 1
+			s.selected = newIndex
 			s.items[s.selected].SetSelected(Selected)
 			s.updateGridItems()
 		}
