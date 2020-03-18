@@ -185,6 +185,17 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 	})
 }
 
+// SetSelected sets active index. First item is 0. If value is out of bounds, do nothing.
+func (s *ScrollList) SetSelected(index int) {
+	if index < 0 || index > len(s.items)-1 {
+		return
+	}
+	s.items[s.selected].SetSelected(Deselected)
+	s.selected = index
+	s.items[s.selected].SetSelected(Selected)
+	s.updateGridItems()
+}
+
 //update grid size after resizing widget
 func (s *ScrollList) updateGrid(x, y, w, h int) {
 	if s.border {
