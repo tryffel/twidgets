@@ -176,11 +176,13 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 			newIndex = len(s.items) - 1
 		}
 
-		if acceptIndexChanged(newIndex) {
-			s.items[s.selected].SetSelected(Deselected)
-			s.selected = newIndex
-			s.items[s.selected].SetSelected(Selected)
-			s.updateGridItems()
+		if len(s.items) > 0 {
+			if acceptIndexChanged(newIndex) {
+				s.items[s.selected].SetSelected(Deselected)
+				s.selected = newIndex
+				s.items[s.selected].SetSelected(Selected)
+				s.updateGridItems()
+			}
 		}
 	})
 }
