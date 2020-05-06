@@ -19,14 +19,14 @@ package main
 import (
 	"fmt"
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 	"os"
 	"tryffel.net/go/twidgets"
 )
 
 // we need button that implements twidgets.Selectable
 type button struct {
-	*tview.Button
+	*cview.Button
 }
 
 func (b *button) SetBlurFunc(blur func(key tcell.Key)) {
@@ -35,15 +35,15 @@ func (b *button) SetBlurFunc(blur func(key tcell.Key)) {
 
 func newButton(label string) *button {
 	b := &button{
-		Button: tview.NewButton(label),
+		Button: cview.NewButton(label),
 	}
 	return b
 }
 
-var app *tview.Application
+var app *cview.Application
 
 func main() {
-	app = tview.NewApplication()
+	app = cview.NewApplication()
 
 	banner := twidgets.NewBanner()
 
@@ -56,7 +56,7 @@ func main() {
 	btnOne := newButton("One")
 	btnTwo := newButton("Two")
 
-	text := tview.NewTextView()
+	text := cview.NewTextView()
 	text.SetText("This is a text view\nanother row")
 
 	btns := []*button{btnExit, btnOne, btnTwo}
@@ -76,9 +76,9 @@ func main() {
 	banner.Grid.AddItem(btnExit, 0, 0, 1, 1, 1, 5, false)
 	banner.Grid.AddItem(text, 0, 2, 2, 5, 1, 10, false)
 	banner.Grid.AddItem(btnOne, 3, 2, 1, 1, 1, 10, false)
-	banner.Grid.AddItem(btnTwo, 3, 4, 1, 1, 1, 10,false)
+	banner.Grid.AddItem(btnTwo, 3, 4, 1, 1, 1, 10, false)
 
-	app.SetRoot(banner, true)
+	app.SetRoot(banner, true).EnableMouse(true)
 	app.SetFocus(banner)
 	app.Run()
 }

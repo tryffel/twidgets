@@ -18,7 +18,7 @@ package twidgets
 
 import (
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 )
 
 type Selection int
@@ -32,7 +32,7 @@ const (
 //ListItem is an item that can be used in ScrollList. Additional SetSelected is required
 // since item doesn't receive focus on selection but still gets to change its visual style.
 type ListItem interface {
-	tview.Primitive
+	cview.Primitive
 	SetSelected(selected Selection)
 }
 
@@ -40,8 +40,8 @@ type ListItem interface {
 // It allows user to scroll items. It also manages rows dynamically. Use Padding and ItemHeight to change
 // grid size. Use Up/Down + (vim: j/k/g/G) to navigate between items and Enter to select item.
 type ScrollList struct {
-	*tview.Grid
-	// Padding is num of rows or relative expansion, see tview.Grid.SetColumns() for usage
+	*cview.Grid
+	// Padding is num of rows or relative expansion, see cview.Grid.SetColumns() for usage
 	Padding    int
 	ItemHeight int
 	items      []ListItem
@@ -66,7 +66,7 @@ func (s *ScrollList) SetBlurFunc(blur func(key tcell.Key)) {
 //SelectFunc can be nil.
 func NewScrollList(selectFunc func(index int)) *ScrollList {
 	s := &ScrollList{
-		Grid:       tview.NewGrid(),
+		Grid:       cview.NewGrid(),
 		items:      make([]ListItem, 0),
 		selectFunc: selectFunc,
 	}
@@ -119,8 +119,8 @@ func (s *ScrollList) GetSelectedIndex() int {
 	return s.selected
 }
 
-func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
-	return s.Grid.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
+func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
+	return s.Grid.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
 		var acceptIndexChanged func(int) bool
 		if s.indexChangedFunc != nil {
 			acceptIndexChanged = s.indexChangedFunc
@@ -301,7 +301,7 @@ func (s *ScrollList) updateGridItems() {
 	}
 }
 
-func (s *ScrollList) Focus(delegate func(p tview.Primitive)) {
+func (s *ScrollList) Focus(delegate func(p cview.Primitive)) {
 	if len(s.items) > 0 {
 		s.items[s.selected].SetSelected(Selected)
 	}
@@ -313,7 +313,7 @@ func (s *ScrollList) Blur() {
 	}
 }
 
-func (s *ScrollList) SetBorder(b bool) *tview.Box {
+func (s *ScrollList) SetBorder(b bool) *cview.Box {
 	s.Grid.SetBorder(b)
 	s.border = true
 	return s.Box

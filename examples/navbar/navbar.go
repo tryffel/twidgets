@@ -19,15 +19,15 @@ package main
 import (
 	"fmt"
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 	"os"
 	"tryffel.net/go/twidgets"
 )
 
-var app *tview.Application
+var app *cview.Application
 
 func main() {
-	app = tview.NewApplication()
+	app = cview.NewApplication()
 
 	colors := twidgets.NavBarColors{
 		Background:            tcell.Color235,
@@ -41,25 +41,24 @@ func main() {
 	}
 	navBar := twidgets.NewNavBar(&colors, done)
 
-	btn := tview.NewButton("first")
+	btn := cview.NewButton("first")
 	navBar.AddButton(btn, tcell.KeyF1)
 
-	btn = tview.NewButton("second")
+	btn = cview.NewButton("second")
 	navBar.AddButton(btn, tcell.KeyF2)
 
-	btn = tview.NewButton("third")
+	btn = cview.NewButton("third")
 	navBar.AddButton(btn, tcell.KeyF3)
 
-	btn = tview.NewButton("fourth")
+	btn = cview.NewButton("fourth")
 	navBar.AddButton(btn, tcell.KeyF4)
 
-	app.SetRoot(navBar,true)
+	app.SetRoot(navBar, true)
 	app.Run()
 }
 
 func done(label string) {
 	fmt.Printf("Got label %s", label)
 	os.Exit(0)
-
 
 }

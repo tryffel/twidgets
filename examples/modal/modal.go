@@ -18,14 +18,14 @@ package main
 
 import (
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 	"time"
 	"tryffel.net/go/twidgets"
 )
 
 // Some modal to show
 type Modal struct {
-	*tview.TextView
+	*cview.TextView
 	doneFunc func()
 }
 
@@ -37,8 +37,8 @@ func (m *Modal) SetVisible(visible bool) {
 }
 
 //Catch enter and escape
-func (m *Modal) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
-	return func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
+func (m *Modal) InputHandler() func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
+	return func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
 		key := event.Key()
 
 		if key == tcell.KeyEnter || key == tcell.KeyEscape {
@@ -49,21 +49,21 @@ func (m *Modal) InputHandler() func(event *tcell.EventKey, setFocus func(p tview
 
 // Demonstrate both Modal and ModalLayout
 func main() {
-	app := tview.NewApplication()
+	app := cview.NewApplication()
 
 	layout := twidgets.NewModalLayout()
 
 	modal := Modal{
-		TextView: tview.NewTextView(),
+		TextView: cview.NewTextView(),
 	}
 
 	modal.SetBorder(true)
 	modal.SetText("A Modal. \nPress enter or escape to close this.")
-	text := tview.NewTextView()
+	text := cview.NewTextView()
 	text.SetText("Some ordinary text. \nModal opens in 1 second")
 	text.SetBorder(true)
 
-	layout.Grid().AddItem(text, 0, 0, 10, 10, 10,10,false)
+	layout.Grid().AddItem(text, 0, 0, 10, 10, 10, 10, false)
 
 	//Close modal
 	close := func() {
@@ -92,6 +92,3 @@ func main() {
 	go open()
 	app.Run()
 }
-
-
-

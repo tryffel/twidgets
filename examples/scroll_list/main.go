@@ -19,13 +19,13 @@ package main
 import (
 	"fmt"
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 	"log"
 	"tryffel.net/go/twidgets"
 )
 
 type Item struct {
-	*tview.TextView
+	*cview.TextView
 	text string
 }
 
@@ -43,7 +43,7 @@ func (i *Item) SetSelected(selected twidgets.Selection) {
 
 func NewItem(text string) *Item {
 	i := &Item{
-		TextView: tview.NewTextView(),
+		TextView: cview.NewTextView(),
 		text:     text,
 	}
 
@@ -53,7 +53,7 @@ func NewItem(text string) *Item {
 }
 
 func main() {
-	app := tview.NewApplication()
+	app := cview.NewApplication()
 	list := twidgets.NewScrollList(printSelect)
 	list.ItemHeight = 2
 

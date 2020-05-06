@@ -18,21 +18,21 @@ package twidgets
 
 import (
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 )
 
 // Selectable is a primitive that's able to set blur func
 type Selectable interface {
-	tview.Primitive
+	cview.Primitive
 	// SetBlurFunc sets blur function that gets called upon blurring primitive
 	SetBlurFunc(func(key tcell.Key))
 }
 
 // Banner combines grid layout and form-movement. To use, configure grid and add elements to it. To allow some item
 // to be selected, add it to Banner.Selectable. Order in this array is same as with selections. Only buttons are
-// supported as selectables. Most of the logic has been copied tview.Form.
+// supported as selectables. Most of the logic has been copied cview.Form.
 type Banner struct {
-	*tview.Grid
+	*cview.Grid
 
 	//Selectable are all primitives that can be navigated and selected inside Banner.
 	Selectable []Selectable
@@ -43,15 +43,15 @@ type Banner struct {
 // NewBanner initializes new banner
 func NewBanner() *Banner {
 	b := &Banner{
-		Grid:       tview.NewGrid(),
+		Grid:       cview.NewGrid(),
 		Selectable: []Selectable{},
 	}
 	return b
 
 }
 
-// Focus. Copied from tview/form
-func (b *Banner) Focus(delegate func(p tview.Primitive)) {
+// Focus. Copied from cview/form
+func (b *Banner) Focus(delegate func(p cview.Primitive)) {
 	if len(b.Selectable) == 0 {
 		b.hasFocus = true
 		return

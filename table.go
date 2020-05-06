@@ -19,7 +19,7 @@ package twidgets
 import (
 	"fmt"
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 )
 
 const (
@@ -37,10 +37,10 @@ const (
 	SortDesc
 )
 
-// Table extends tview.Table with some helpers for managing rows.
+// Table extends cview.Table with some helpers for managing rows.
 // In addition it provides sorting capabilities.
 type Table struct {
-	*tview.Table
+	*cview.Table
 
 	columns          []string
 	columnWidths     []int
@@ -50,13 +50,13 @@ type Table struct {
 	sortType         Sort
 
 	sortFunc    func(col string, sort Sort)
-	addCellFunc func(cell *tview.TableCell, header bool, col int)
+	addCellFunc func(cell *cview.TableCell, header bool, col int)
 }
 
 // NewTable creates new table instance
 func NewTable() *Table {
 	t := &Table{
-		Table: tview.NewTable(),
+		Table: cview.NewTable(),
 	}
 
 	t.Table.SetFixed(1, 100)
@@ -77,7 +77,7 @@ func (t *Table) SetSortFunc(sortFunc func(column string, sort Sort)) *Table {
 
 // SetAddCellFunc add function callback that gets called every time a new cell is added with flag of whether
 // the cell is in header row. Use this to modify e.g. style of the cell when it gets added to table.
-func (t *Table) SetAddCellFunc(cellFunc func(cell *tview.TableCell, header bool, col int)) *Table {
+func (t *Table) SetAddCellFunc(cellFunc func(cell *cview.TableCell, header bool, col int)) *Table {
 	t.addCellFunc = cellFunc
 	return t
 }
@@ -107,7 +107,7 @@ func (t *Table) Clear(headers bool) *Table {
 		t.Table.Clear()
 	} else {
 		count := t.Table.GetColumnCount()
-		cells := make([]*tview.TableCell, count)
+		cells := make([]*cview.TableCell, count)
 		for i := 0; i < count; i++ {
 			cells[i] = t.Table.GetCell(0, i)
 		}
@@ -125,13 +125,13 @@ func (t *Table) Clear(headers bool) *Table {
 func (t *Table) AddRow(index int, content ...string) *Table {
 	count := len(content)
 
-	cells := make([]*tview.TableCell, count, count+1)
+	cells := make([]*cview.TableCell, count, count+1)
 	for i := 0; i < len(content); i++ {
-		cells[i] = tview.NewTableCell(content[i])
+		cells[i] = cview.NewTableCell(content[i])
 	}
 
 	if t.showIndex {
-		cells = append([]*tview.TableCell{tview.NewTableCell(fmt.Sprint(index + 1))}, cells...)
+		cells = append([]*cview.TableCell{cview.NewTableCell(fmt.Sprint(index + 1))}, cells...)
 	}
 
 	for i := 0; i < len(cells); i++ {
@@ -178,7 +178,7 @@ func (t *Table) SetColumns(columns []string) *Table {
 		}
 	}
 	for i := 0; i < len(columns); i++ {
-		cell := tview.NewTableCell(columns[i])
+		cell := cview.NewTableCell(columns[i])
 		if t.addCellFunc != nil {
 			t.addCellFunc(cell, true, 0)
 		}
@@ -189,8 +189,8 @@ func (t *Table) SetColumns(columns []string) *Table {
 }
 
 //Inputhandler handles header row inputs
-func (t *Table) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
-	return func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
+func (t *Table) InputHandler() func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
+	return func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
 		enableHeader := false
 		key := event.Key()
 		if t.sortFunc != nil {

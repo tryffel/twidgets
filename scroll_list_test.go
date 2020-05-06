@@ -18,13 +18,13 @@ package twidgets
 
 import (
 	"fmt"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 	"reflect"
 	"testing"
 )
 
 type testItem struct {
-	*tview.TextView
+	*cview.TextView
 }
 
 func (t *testItem) SetSelected(selection Selection) {}
@@ -36,7 +36,7 @@ func TestScrollList_updateGrid(t *testing.T) {
 	items := make([]*testItem, createItems)
 
 	for i := 0; i < createItems; i++ {
-		item := &testItem{tview.NewTextView()}
+		item := &testItem{cview.NewTextView()}
 		item.SetBorder(false)
 
 		item.SetText(fmt.Sprintf("Item %d\n2nd row", i))

@@ -19,7 +19,7 @@ package twidgets
 import (
 	"fmt"
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 )
 
 // NacBarColors are colors that fully describe navbar look
@@ -37,8 +37,8 @@ type NavBarColors struct {
 // NavBar implements navigation bar with multiple buttons. Buttons can be added one by one, each one having
 // their own callbacks. In addition, optional DoneFunc is called with label of the selected button.
 type NavBar struct {
-	grid      *tview.Grid
-	buttons   []*tview.Button
+	grid      *cview.Grid
+	buttons   []*cview.Button
 	btnKeys   []tcell.Key
 	btnLabels []string
 	doneFunc  func(label string)
@@ -61,8 +61,8 @@ func (n *NavBar) SetRect(x, y, width, height int) {
 	n.grid.SetRect(x, y, width, height)
 }
 
-func (n *NavBar) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
-	return func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
+func (n *NavBar) InputHandler() func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
+	return func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
 		lastBtn := n.btnActiveIndex
 
 		key := event.Key()
@@ -91,7 +91,7 @@ func (n *NavBar) InputHandler() func(event *tcell.EventKey, setFocus func(p tvie
 	}
 }
 
-func (n *NavBar) Focus(delegate func(p tview.Primitive)) {
+func (n *NavBar) Focus(delegate func(p cview.Primitive)) {
 	n.grid.Focus(delegate)
 	n.hasFocus = true
 	n.buttons[n.btnActiveIndex].Focus(nil)
@@ -103,7 +103,7 @@ func (n *NavBar) Blur() {
 	n.grid.Blur()
 }
 
-func (n *NavBar) GetFocusable() tview.Focusable {
+func (n *NavBar) GetFocusable() cview.Focusable {
 	return n.grid.GetFocusable()
 }
 
@@ -111,8 +111,8 @@ func (n *NavBar) GetFocusable() tview.Focusable {
 // DoneFunc can be set nil.
 func NewNavBar(colors *NavBarColors, doneFunc func(label string)) *NavBar {
 	nav := &NavBar{
-		grid:      tview.NewGrid(),
-		buttons:   []*tview.Button{},
+		grid:      cview.NewGrid(),
+		buttons:   []*cview.Button{},
 		btnKeys:   []tcell.Key{},
 		btnLabels: []string{},
 		doneFunc:  doneFunc,
@@ -128,7 +128,7 @@ func NewNavBar(colors *NavBarColors, doneFunc func(label string)) *NavBar {
 }
 
 //AddButton adds a new button to right side of existing buttons. Key is used to print and highlight key to user
-func (n *NavBar) AddButton(button *tview.Button, key tcell.Key) {
+func (n *NavBar) AddButton(button *cview.Button, key tcell.Key) {
 	n.buttons = append(n.buttons, button)
 	n.btnKeys = append(n.btnKeys, key)
 	n.btnLabels = append(n.btnLabels, button.GetLabel())

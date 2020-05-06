@@ -18,12 +18,12 @@ package main
 
 import (
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 	"tryffel.net/go/twidgets"
 )
 
 func main() {
-	app := tview.NewApplication()
+	app := cview.NewApplication()
 
 	table := twidgets.NewTable()
 	app.SetRoot(table, true)
@@ -31,8 +31,8 @@ func main() {
 	table.SetAddCellFunc(addCell)
 	table.SetShowIndex(true)
 	table.SetColumns([]string{"Name", "Description"})
-	table.SetColumnWidths([]int{2,10,15})
-	table.SetColumnExpansions([]int{0,1,2})
+	table.SetColumnWidths([]int{2, 10, 15})
+	table.SetColumnExpansions([]int{0, 1, 2})
 	table.SetSort(1, twidgets.SortAsc)
 
 	table.AddRow(0, "A", "first sample")
@@ -60,12 +60,12 @@ func main() {
 			table.AddRow(3, "C", "third sample")
 			table.AddRow(1, "D", "fourth sample")
 		} else if col == "Description" && sort == twidgets.SortDesc {
-		table.Clear(false)
-		table.AddRow(3, "A", "first sample")
-		table.AddRow(1, "B", "second sample")
-		table.AddRow(0, "C", "third sample")
-		table.AddRow(2, "D", "fourth sample")
-	}
+			table.Clear(false)
+			table.AddRow(3, "A", "first sample")
+			table.AddRow(1, "B", "second sample")
+			table.AddRow(0, "C", "third sample")
+			table.AddRow(2, "D", "fourth sample")
+		}
 	}
 	table.SetSortFunc(sortFunc)
 	//table.SetSortFunc(nil)
@@ -73,13 +73,12 @@ func main() {
 	app.Run()
 }
 
-
-func addCell(cell *tview.TableCell, header bool, col int) {
+func addCell(cell *cview.TableCell, header bool, col int) {
 	if header {
 		cell.SetBackgroundColor(tcell.ColorGreen)
 	} else {
 		// Change color for every 2nd row
-		if col % 2 == 0 {
+		if col%2 == 0 {
 			cell.SetBackgroundColor(tcell.ColorGray)
 		} else {
 			cell.SetBackgroundColor(tcell.ColorDarkGray)

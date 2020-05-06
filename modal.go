@@ -19,7 +19,7 @@ package twidgets
 import (
 	"fmt"
 	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
+	"gitlab.com/tslocum/cview"
 )
 
 //Modal interface creates a modal that overlaps other views and get's destroyed when it's ready
@@ -27,7 +27,7 @@ import (
 //Modal interface is primitive that is drawn on top of other views and get's destroyed when it's ready
 type Modal interface {
 	//Primitive
-	tview.Primitive
+	cview.Primitive
 	//SetDoneFunc sets function that get's called when modal wants to close itself
 	SetDoneFunc(doneFunc func())
 	//Setvisible tells modal to show or hide itself
@@ -52,7 +52,7 @@ each one of size -1. This can be changed with SetGridSize, but size must still 1
 Use AddModal and RemoveModal to manage modals. Only single modal can be shown at a time.
 */
 type ModalLayout struct {
-	grid       *tview.Grid
+	grid       *cview.Grid
 	hasModal   bool
 	customGrid bool
 	modal      Modal
@@ -66,7 +66,7 @@ type ModalLayout struct {
 // [-1, -1, -1, -1, -1]. This can be modified by accessing grid with ModalLayout.Grid()
 func NewModalLayout() *ModalLayout {
 	m := &ModalLayout{
-		grid:       tview.NewGrid(),
+		grid:       cview.NewGrid(),
 		hasModal:   false,
 		customGrid: false,
 		modal:      nil,
@@ -101,13 +101,13 @@ func (m *ModalLayout) SetRect(x, y, width, height int) {
 	m.grid.SetRect(x, y, width, height)
 }
 
-func (m *ModalLayout) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
-	return m.grid.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
+func (m *ModalLayout) InputHandler() func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
+	return m.grid.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
 
 	})
 }
 
-func (m *ModalLayout) Focus(delegate func(p tview.Primitive)) {
+func (m *ModalLayout) Focus(delegate func(p cview.Primitive)) {
 	m.grid.Focus(delegate)
 }
 
@@ -115,12 +115,12 @@ func (m *ModalLayout) Blur() {
 	m.grid.Blur()
 }
 
-func (m *ModalLayout) GetFocusable() tview.Focusable {
+func (m *ModalLayout) GetFocusable() cview.Focusable {
 	return m.grid.GetFocusable()
 }
 
 //GetGrid returns underlying grid that items are added to
-func (m *ModalLayout) Grid() *tview.Grid {
+func (m *ModalLayout) Grid() *cview.Grid {
 	return m.grid
 }
 
