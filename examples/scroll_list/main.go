@@ -54,7 +54,7 @@ func NewItem(text string) *Item {
 
 func main() {
 	app := cview.NewApplication()
-	list := twidgets.NewScrollList(printSelect)
+	list := twidgets.NewScrollList(nil)
 	list.ItemHeight = 2
 
 	items := make([]*Item, 0)
@@ -77,6 +77,12 @@ func main() {
 	}
 
 	list.SetIndexChangedFunc(indexChangedFunc)
+
+	list.AddContextItem("Option a", 0, func(n int) {})
+	list.AddContextItem("Option b", 0, func(n int) {})
+	list.AddContextItem("Option c", 0, func(n int) {})
+	list.AddContextItem("Option d", 0, func(n int) {})
+	list.AddContextItem("Option e", 0, func(n int) {})
 
 	app.SetRoot(list, true)
 	app.Run()

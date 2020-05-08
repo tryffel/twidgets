@@ -41,6 +41,9 @@ type ListItem interface {
 // grid size. Use Up/Down + (vim: j/k/g/G) to navigate between items and Enter to select item.
 type ScrollList struct {
 	*cview.Grid
+	*cview.ContextMenu
+
+	contextMenuOpen bool
 	// Padding is num of rows or relative expansion, see cview.Grid.SetColumns() for usage
 	Padding    int
 	ItemHeight int
@@ -70,6 +73,8 @@ func NewScrollList(selectFunc func(index int)) *ScrollList {
 		items:      make([]ListItem, 0),
 		selectFunc: selectFunc,
 	}
+
+	s.ContextMenu = cview.NewContextMenu(s)
 
 	s.Grid.SetColumns(2, -2, -1)
 	s.Padding = 1
@@ -142,14 +147,25 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 			scrollDown = true
 		case tcell.KeyUp:
 			scrollUp = true
-		case tcell.KeyEnter:
-			if s.selectFunc != nil {
-				s.selectFunc(s.selected)
-			}
+
 		case tcell.KeyTAB, tcell.KeyBacktab:
 			if s.blurFunc != nil {
 				s.blurFunc(key)
 			}
+		case tcell.KeyEnter:
+			if s.selectFunc != nil {
+				s.selectFunc(s.selected)
+			}
+			if event.Modifiers()&tcell.ModAlt != 0 {
+				// Do we show any shortcuts?
+				if s.ContextMenu.ContextMenuList().GetItemCount() > 0 {
+					x, y, _, _ := s.items[s.selected].GetRect()
+					s.contextMenuOpen = true
+					s.ContextMenu.ShowContextMenu(0, x, y, setFocus)
+					return
+				}
+			}
+
 		default:
 			if r == 'j' {
 				scrollDown = true
@@ -302,19 +318,82 @@ func (s *ScrollList) updateGridItems() {
 }
 
 func (s *ScrollList) Focus(delegate func(p cview.Primitive)) {
-	if len(s.items) > 0 {
+	if s.contextMenuOpen {
+		delegate(s.ContextMenu.ContextMenuList())
+	} else if len(s.items) > 0 {
 		s.items[s.selected].SetSelected(Selected)
 	}
+}
+
+func (s *ScrollList) HasFocus() bool {
+	if s.contextMenuOpen {
+		return true
+	}
+	return s.Grid.HasFocus()
 }
 
 func (s *ScrollList) Blur() {
 	if len(s.items) > 0 {
 		s.items[s.selected].SetSelected(Blurred)
 	}
+	s.contextMenuOpen = false
 }
 
 func (s *ScrollList) SetBorder(b bool) *cview.Box {
 	s.Grid.SetBorder(b)
 	s.border = true
 	return s.Box
+}
+
+func (s *ScrollList) Draw(screen tcell.Screen) {
+	s.Grid.Draw(screen)
+	if s.ContextMenuList().HasFocus() {
+		list := s.ContextMenu.ContextMenuList()
+
+		cx, cy, width, height := s.items[s.selected].GetRect()
+		maxWidth := 0
+		itemCount := list.GetItemCount()
+		lheight := itemCount
+		if lheight < 0 {
+			lheight = 0
+		}
+
+		totalItems := list.GetItemCount()
+		for i := 0; i < totalItems; i++ {
+			text, _ := list.GetItemText(i)
+			strWidth := cview.TaggedStringWidth(text)
+			if strWidth > maxWidth {
+				maxWidth = strWidth
+			}
+		}
+		lwidth := maxWidth
+		cx = width - lwidth - width/10
+
+		// Add space for borders
+		lwidth += 2
+		lheight += 2
+
+		// add paddings
+		lwidth += 2
+
+		x, y, _, _ := s.GetInnerRect()
+		if cx < 0 || cy < 0 {
+			cx = x + (width / 2)
+			cy = y + (height / 2)
+		}
+
+		_, sheight := screen.Size()
+		if cy+lheight >= sheight && cy-2 > lheight-cy {
+			cy = cy - lheight
+			if cy < 0 {
+				cy = 0
+			}
+		}
+		if cy+lheight >= sheight {
+			lheight = sheight - cy
+		}
+
+		list.SetRect(cx, cy, lwidth, lheight)
+		list.Draw(screen)
+	}
 }
