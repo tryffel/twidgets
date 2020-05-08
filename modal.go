@@ -62,6 +62,10 @@ type ModalLayout struct {
 	gridAxisY []int
 }
 
+func (m *ModalLayout) MouseHandler() func(action cview.MouseAction, event *tcell.EventMouse, setFocus func(p cview.Primitive)) (consumed bool, capture cview.Primitive) {
+	return m.grid.MouseHandler()
+}
+
 //NewModalLayout creates new modal layout. Default grid is
 // [-1, -1, -1, -1, -1]. This can be modified by accessing grid with ModalLayout.Grid()
 func NewModalLayout() *ModalLayout {

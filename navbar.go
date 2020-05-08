@@ -49,6 +49,10 @@ type NavBar struct {
 	hasFocus       bool
 }
 
+func (n *NavBar) MouseHandler() func(action cview.MouseAction, event *tcell.EventMouse, setFocus func(p cview.Primitive)) (consumed bool, capture cview.Primitive) {
+	return n.grid.MouseHandler()
+}
+
 func (n *NavBar) Draw(screen tcell.Screen) {
 	n.grid.Draw(screen)
 }
