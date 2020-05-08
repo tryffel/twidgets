@@ -84,7 +84,7 @@ func main() {
 	list.AddContextItem("Option d", 0, func(n int) {})
 	list.AddContextItem("Option e", 0, func(n int) {})
 
-	app.SetRoot(list, true)
+	app.SetRoot(list, true).EnableMouse(true)
 	app.Run()
 }
 

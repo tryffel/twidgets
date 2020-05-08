@@ -203,6 +203,77 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 	})
 }
 
+// MouseHandler returns the mouse handler for this primitive.
+func (s *ScrollList) MouseHandler() func(action cview.MouseAction, event *tcell.EventMouse, setFocus func(p cview.Primitive)) (consumed bool, capture cview.Primitive) {
+	return s.WrapMouseHandler(func(action cview.MouseAction, event *tcell.EventMouse, setFocus func(p cview.Primitive)) (consumed bool, capture cview.Primitive) {
+		// Pass events to context menu.
+		if s.contextMenuOpen && s.ContextMenu.ContextMenuList().GetItemCount() > 0 &&
+			s.ContextMenu.ContextMenuList().InRect(event.Position()) {
+			s.ContextMenu.ContextMenuList().MouseHandler()(action, event, setFocus)
+			consumed = true
+			return
+		}
+
+		if !s.InRect(event.Position()) {
+			return false, nil
+		}
+
+		// Process mouse event.
+		switch action {
+		case cview.MouseLeftClick:
+			if s.contextMenuOpen {
+				setFocus(s)
+				consumed = true
+				return
+			}
+
+			setFocus(s)
+			index := s.indexAtPoint(event.Position())
+			if index != -1 && index < len(s.items) {
+				s.items[s.selected].SetSelected(Deselected)
+				s.selected = index
+				s.items[s.selected].SetSelected(Selected)
+				s.updateGridItems()
+				consumed = true
+			}
+		case cview.MouseRightClick:
+			if s.contextMenuOpen {
+				return
+			}
+			setFocus(s)
+			index := s.indexAtPoint(event.Position())
+			if index != -1 && index < len(s.items) {
+				s.items[s.selected].SetSelected(Deselected)
+				s.selected = index
+				s.items[s.selected].SetSelected(Selected)
+				s.updateGridItems()
+				consumed = true
+			}
+
+			if s.ContextMenu.ContextMenuList().GetItemCount() > 0 {
+				x, y, _, _ := s.items[s.selected].GetRect()
+				s.contextMenuOpen = true
+				s.ContextMenu.ShowContextMenu(0, x, y, setFocus)
+				return
+			}
+		}
+		return
+	})
+}
+
+func (s *ScrollList) indexAtPoint(x, y int) int {
+	rectX, rectY, width, height := s.GetInnerRect()
+	if x < rectX || x >= rectX+width || y < rectY || y >= rectY+height {
+		return -1
+	}
+
+	relativeY := y - rectY
+
+	index := relativeY / (s.ItemHeight + s.Padding)
+	return index
+
+}
+
 // SetSelected sets active index. First item is 0. If value is out of bounds, do nothing.
 func (s *ScrollList) SetSelected(index int) {
 	if index < 0 || index > len(s.items)-1 {
