@@ -158,7 +158,7 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 			}
 			if event.Modifiers()&tcell.ModAlt != 0 {
 				// Do we show any shortcuts?
-				if s.ContextMenu.ContextMenuList().GetItemCount() > 0 {
+				if s.contextMenuItems() > 0 {
 					x, y, _, _ := s.items[s.selected].GetRect()
 					s.contextMenuOpen = true
 					s.ContextMenu.ShowContextMenu(0, x, y, setFocus)
@@ -207,7 +207,7 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 func (s *ScrollList) MouseHandler() func(action cview.MouseAction, event *tcell.EventMouse, setFocus func(p cview.Primitive)) (consumed bool, capture cview.Primitive) {
 	return s.WrapMouseHandler(func(action cview.MouseAction, event *tcell.EventMouse, setFocus func(p cview.Primitive)) (consumed bool, capture cview.Primitive) {
 		// Pass events to context menu.
-		if s.contextMenuOpen && s.ContextMenu.ContextMenuList().GetItemCount() > 0 &&
+		if s.contextMenuOpen && s.contextMenuItems() > 0 &&
 			s.ContextMenu.ContextMenuList().InRect(event.Position()) {
 			s.ContextMenu.ContextMenuList().MouseHandler()(action, event, setFocus)
 			consumed = true
@@ -250,7 +250,7 @@ func (s *ScrollList) MouseHandler() func(action cview.MouseAction, event *tcell.
 				consumed = true
 			}
 
-			if s.ContextMenu.ContextMenuList().GetItemCount() > 0 {
+			if s.contextMenuItems() > 0 {
 				x, y, _, _ := s.items[s.selected].GetRect()
 				s.contextMenuOpen = true
 				s.ContextMenu.ShowContextMenu(0, x, y, setFocus)
@@ -389,7 +389,7 @@ func (s *ScrollList) updateGridItems() {
 }
 
 func (s *ScrollList) Focus(delegate func(p cview.Primitive)) {
-	if s.contextMenuOpen {
+	if s.contextMenuOpen && s.contextMenuItems() > 0{
 		delegate(s.ContextMenu.ContextMenuList())
 	} else if len(s.items) > 0 {
 		s.items[s.selected].SetSelected(Selected)
@@ -418,53 +418,63 @@ func (s *ScrollList) SetBorder(b bool) *cview.Box {
 
 func (s *ScrollList) Draw(screen tcell.Screen) {
 	s.Grid.Draw(screen)
-	if s.ContextMenuList().HasFocus() {
-		list := s.ContextMenu.ContextMenuList()
+	if s.contextMenuItems() > 0 {
+		if s.ContextMenuList().HasFocus() {
+			list := s.ContextMenu.ContextMenuList()
 
-		cx, cy, width, height := s.items[s.selected].GetRect()
-		maxWidth := 0
-		itemCount := list.GetItemCount()
-		lheight := itemCount
-		if lheight < 0 {
-			lheight = 0
-		}
-
-		totalItems := list.GetItemCount()
-		for i := 0; i < totalItems; i++ {
-			text, _ := list.GetItemText(i)
-			strWidth := cview.TaggedStringWidth(text)
-			if strWidth > maxWidth {
-				maxWidth = strWidth
+			cx, cy, width, height := s.items[s.selected].GetRect()
+			maxWidth := 0
+			itemCount := list.GetItemCount()
+			lheight := itemCount
+			if lheight < 0 {
+				lheight = 0
 			}
-		}
-		lwidth := maxWidth
-		cx = width - lwidth - width/10
 
-		// Add space for borders
-		lwidth += 2
-		lheight += 2
-
-		// add paddings
-		lwidth += 2
-
-		x, y, _, _ := s.GetInnerRect()
-		if cx < 0 || cy < 0 {
-			cx = x + (width / 2)
-			cy = y + (height / 2)
-		}
-
-		_, sheight := screen.Size()
-		if cy+lheight >= sheight && cy-2 > lheight-cy {
-			cy = cy - lheight
-			if cy < 0 {
-				cy = 0
+			totalItems := list.GetItemCount()
+			for i := 0; i < totalItems; i++ {
+				text, _ := list.GetItemText(i)
+				strWidth := cview.TaggedStringWidth(text)
+				if strWidth > maxWidth {
+					maxWidth = strWidth
+				}
 			}
-		}
-		if cy+lheight >= sheight {
-			lheight = sheight - cy
-		}
+			lwidth := maxWidth
+			cx = width - lwidth - width/10
 
-		list.SetRect(cx, cy, lwidth, lheight)
-		list.Draw(screen)
+			// Add space for borders
+			lwidth += 2
+			lheight += 2
+
+			// add paddings
+			lwidth += 2
+
+			x, y, _, _ := s.GetInnerRect()
+			if cx < 0 || cy < 0 {
+				cx = x + (width / 2)
+				cy = y + (height / 2)
+			}
+
+			_, sheight := screen.Size()
+			if cy+lheight >= sheight && cy-2 > lheight-cy {
+				cy = cy - lheight
+				if cy < 0 {
+					cy = 0
+				}
+			}
+			if cy+lheight >= sheight {
+				lheight = sheight - cy
+			}
+
+			list.SetRect(cx, cy, lwidth, lheight)
+			list.Draw(screen)
+		}
 	}
+}
+
+func (s *ScrollList) contextMenuItems() int {
+	list := s.ContextMenuList()
+	if list == nil {
+		return 0
+	}
+	return list.GetItemCount()
 }
