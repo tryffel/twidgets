@@ -76,10 +76,10 @@ func NewScrollList(selectFunc func(index int)) *ScrollList {
 
 	s.ContextMenu = cview.NewContextMenu(s)
 
-	s.Grid.SetColumns(2, -2, -1)
+	s.Grid.SetColumns(2, -2)
 	s.Padding = 1
 	s.ItemHeight = 3
-	s.gridRows = []int{2, -2, -1}
+	s.gridRows = []int{2, -2}
 	return s
 }
 
@@ -366,7 +366,7 @@ func (s *ScrollList) updateGridItems() {
 		s.visibleFrom = s.selected
 		s.visibleTo = s.selected
 		s.Grid.Clear()
-		s.Grid.AddItem(s.items[s.selected], 1, 1, 1, 1, 4, 10, false)
+		s.Grid.AddItem(s.items[s.selected], 1, 1, 1, 3, 4, 10, false)
 		return
 	}
 
@@ -399,7 +399,7 @@ func (s *ScrollList) updateGridItems() {
 			break
 		}
 		item := s.items[s.visibleFrom+i]
-		s.Grid.AddItem(item, i*2, 1, 1, 1, 4, 10, false)
+		s.Grid.AddItem(item, i*2, 1, 1, 3, 4, 10, false)
 	}
 }
 
@@ -454,7 +454,7 @@ func (s *ScrollList) Draw(screen tcell.Screen) {
 				}
 			}
 			lwidth := maxWidth
-			cx = width - lwidth - 4
+			cx += width - lwidth - 10
 
 			// Add space for borders
 			lwidth += 2
