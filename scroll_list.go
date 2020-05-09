@@ -454,7 +454,7 @@ func (s *ScrollList) Draw(screen tcell.Screen) {
 				}
 			}
 			lwidth := maxWidth
-			cx = width - lwidth - width/10
+			cx = width - lwidth - 4
 
 			// Add space for borders
 			lwidth += 2
