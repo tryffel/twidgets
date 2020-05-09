@@ -21,6 +21,7 @@ import (
 	"github.com/gdamore/tcell"
 	"gitlab.com/tslocum/cview"
 	"log"
+	"time"
 	"tryffel.net/go/twidgets"
 )
 
@@ -54,7 +55,7 @@ func NewItem(text string) *Item {
 
 func main() {
 	app := cview.NewApplication()
-	list := twidgets.NewScrollList(nil)
+	list := twidgets.NewScrollList(printSelect)
 	list.ItemHeight = 2
 
 	items := make([]*Item, 0)
@@ -84,7 +85,7 @@ func main() {
 	list.AddContextItem("Option d", 0, func(n int) {})
 	list.AddContextItem("Option e", 0, func(n int) {})
 
-	app.SetRoot(list, true).EnableMouse(true)
+	app.SetRoot(list, true).EnableMouse(true).SetDoubleClickInterval(time.Millisecond * 200)
 	app.Run()
 }
 

@@ -256,6 +256,21 @@ func (s *ScrollList) MouseHandler() func(action cview.MouseAction, event *tcell.
 				s.ContextMenu.ShowContextMenu(0, x, y, setFocus)
 				return
 			}
+		case cview.MouseLeftDoubleClick:
+			if s.contextMenuOpen {
+				setFocus(s)
+				consumed = true
+			}
+			index := s.indexAtPoint(event.Position())
+			if index != -1 && index < len(s.items) {
+				s.items[s.selected].SetSelected(Deselected)
+				s.selected = index
+				s.items[s.selected].SetSelected(Selected)
+				s.updateGridItems()
+				if s.selectFunc != nil {
+					s.selectFunc(s.selected)
+				}
+			}
 		}
 		return
 	})
@@ -389,7 +404,7 @@ func (s *ScrollList) updateGridItems() {
 }
 
 func (s *ScrollList) Focus(delegate func(p cview.Primitive)) {
-	if s.contextMenuOpen && s.contextMenuItems() > 0{
+	if s.contextMenuOpen && s.contextMenuItems() > 0 {
 		delegate(s.ContextMenu.ContextMenuList())
 	} else if len(s.items) > 0 {
 		s.items[s.selected].SetSelected(Selected)
