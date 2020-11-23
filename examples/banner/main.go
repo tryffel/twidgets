@@ -18,7 +18,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"gitlab.com/tslocum/cview"
 	"os"
 	"tryffel.net/go/twidgets"
@@ -63,9 +63,9 @@ func main() {
 	selectables := []twidgets.Selectable{btnExit, btnOne, btnTwo}
 	for _, btn := range btns {
 		btn.SetLabelColor(tcell.ColorBlack)
-		btn.SetLabelColorActivated(tcell.ColorGray)
+		btn.SetLabelColorFocused(tcell.ColorGray)
 		btn.SetBackgroundColor(tcell.ColorWhite)
-		btn.SetBackgroundColorActivated(tcell.ColorGreen)
+		btn.SetBackgroundColorFocused(tcell.ColorGreen)
 	}
 
 	banner.Selectable = selectables
@@ -78,7 +78,10 @@ func main() {
 	banner.Grid.AddItem(btnOne, 3, 2, 1, 1, 1, 10, false)
 	banner.Grid.AddItem(btnTwo, 3, 4, 1, 1, 1, 10, false)
 
-	app.SetRoot(banner, true).EnableMouse(true)
+	app.SetRoot(banner, true)
+
+	app.SetRoot(banner, true)
+	app.EnableMouse(true)
 	app.SetFocus(banner)
 	app.Run()
 }

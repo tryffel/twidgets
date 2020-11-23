@@ -18,7 +18,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"gitlab.com/tslocum/cview"
 	"log"
 	"time"
@@ -85,7 +85,9 @@ func main() {
 	list.AddContextItem("Option d", 0, func(n int) {})
 	list.AddContextItem("Option e", 0, func(n int) {})
 
-	app.SetRoot(list, true).EnableMouse(true).SetDoubleClickInterval(time.Millisecond * 200)
+	app.SetRoot(list, true)
+	app.EnableMouse(true)
+	app.SetDoubleClickInterval(time.Millisecond * 200)
 	app.Run()
 }
 

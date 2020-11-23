@@ -17,7 +17,7 @@
 package main
 
 import (
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"gitlab.com/tslocum/cview"
 	"time"
 	"tryffel.net/go/twidgets"
@@ -80,7 +80,7 @@ func main() {
 		app.QueueUpdateDraw(func() {
 			text.Blur()
 			//layout.AddDynamicModal(&modal, twidgets.ModalSizeMedium/)
-			layout.AddFixedModal(&modal, 10, 10, twidgets.ModalSizeLarge)
+			layout.AddFixedModal(&modal, 10, 30, twidgets.ModalSizeLarge)
 
 			app.SetFocus(&modal)
 		})

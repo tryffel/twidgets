@@ -18,7 +18,7 @@ package twidgets
 
 import (
 	"fmt"
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"gitlab.com/tslocum/cview"
 )
 
@@ -47,9 +47,19 @@ type NavBar struct {
 	// Which button is active
 	btnActiveIndex int
 	hasFocus       bool
+	visible        bool
 }
 
-func (n *NavBar) MouseHandler() func(action cview.MouseAction, event *tcell.EventMouse, setFocus func(p cview.Primitive)) (consumed bool, capture cview.Primitive) {
+func (n *NavBar) GetVisible() bool {
+	return n.visible
+}
+
+func (n *NavBar) SetVisible(v bool) {
+	n.visible = v
+}
+
+func (n *NavBar) MouseHandler() func(action cview.MouseAction, event *tcell.EventMouse,
+	setFocus func(p cview.Primitive)) (consumed bool, capture cview.Primitive) {
 	return n.grid.MouseHandler()
 }
 
@@ -139,9 +149,9 @@ func (n *NavBar) AddButton(button *cview.Button, key tcell.Key) {
 	button.SetBorder(false)
 	button.SetSelectedFunc(wrapKeyFunc(button.GetLabel(), n.doneFunc))
 	button.SetBackgroundColor(n.colors.ButtonBackground)
-	button.SetBackgroundColorActivated(n.colors.ButtonBackgroundFocus)
+	button.SetBackgroundColorFocused(n.colors.ButtonBackgroundFocus)
 	button.SetLabelColor(n.colors.Text)
-	button.SetLabelColorActivated(n.colors.TextFocus)
+	button.SetLabelColorFocused(n.colors.TextFocus)
 
 	hex := n.colors.Shortcut.Hex()
 
