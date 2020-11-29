@@ -59,6 +59,9 @@ type ScrollList struct {
 	selectFunc       func(int)
 	blurFunc         func(key tcell.Key)
 	indexChangedFunc func(int) bool
+
+	// PreInputHandler is called before actual InputHandler, if any.
+    PreInputHandler func(event *tcell.EventKey, setFocus func(p cview.Primitive))
 }
 
 func (s *ScrollList) SetBlurFunc(blur func(key tcell.Key)) {
@@ -102,6 +105,10 @@ func (s *ScrollList) AddItems(i ...ListItem) {
 	s.updateGridItems()
 }
 
+func (s *ScrollList) GetItems() []ListItem {
+	return s.items
+}
+
 //Clear clears list items an updates view
 func (s *ScrollList) Clear() {
 	s.items = make([]ListItem, 0)
@@ -125,7 +132,11 @@ func (s *ScrollList) GetSelectedIndex() int {
 }
 
 func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
-	return s.Grid.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
+	return s.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p cview.Primitive)) {
+        if s.PreInputHandler != nil {
+            s.PreInputHandler(event, setFocus)
+        }
+
 		var acceptIndexChanged func(int) bool
 		if s.indexChangedFunc != nil {
 			acceptIndexChanged = s.indexChangedFunc
