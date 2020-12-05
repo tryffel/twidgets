@@ -164,9 +164,6 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 				s.blurFunc(key)
 			}
 		case tcell.KeyEnter:
-			if s.selectFunc != nil {
-				s.selectFunc(s.selected)
-			}
 			if event.Modifiers()&tcell.ModAlt != 0 {
 				// Do we show any shortcuts?
 				if s.contextMenuItems() > 0 {
@@ -175,7 +172,10 @@ func (s *ScrollList) InputHandler() func(event *tcell.EventKey, setFocus func(p 
 					s.ContextMenu.ShowContextMenu(0, x, y, setFocus)
 					return
 				}
+			} else if s.selectFunc != nil {
+				s.selectFunc(s.selected)
 			}
+
 
 		default:
 			if r == 'j' {
