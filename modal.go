@@ -18,7 +18,7 @@ package twidgets
 
 import (
 	"fmt"
-	"github.com/gdamore/tcell/v2"
+	"github.com/gdamore/tcell"
 	"gitlab.com/tslocum/cview"
 )
 
@@ -31,7 +31,7 @@ type Modal interface {
 	//SetDoneFunc sets function that get's called when modal wants to close itself
 	SetDoneFunc(doneFunc func())
 	//Setvisible tells modal to show or hide itself
-	//SetVisible(visible bool)
+	SetVisible(visible bool)
 }
 
 // ModalSize describes both horizontal & vertical size for modal
@@ -60,7 +60,6 @@ type ModalLayout struct {
 	//Default grid col/row weights
 	gridAxisX []int
 	gridAxisY []int
-	visible   bool
 }
 
 func (m *ModalLayout) MouseHandler() func(action cview.MouseAction, event *tcell.EventMouse,

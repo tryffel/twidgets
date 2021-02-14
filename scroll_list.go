@@ -17,7 +17,7 @@
 package twidgets
 
 import (
-	"github.com/gdamore/tcell/v2"
+	"github.com/gdamore/tcell"
 	"gitlab.com/tslocum/cview"
 )
 
