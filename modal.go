@@ -57,6 +57,8 @@ type ModalLayout struct {
 	customGrid bool
 	modal      Modal
 
+	visible bool
+
 	//Default grid col/row weights
 	gridAxisX []int
 	gridAxisY []int
